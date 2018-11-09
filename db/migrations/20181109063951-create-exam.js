@@ -9,7 +9,17 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       name: {
+        allowNull: false,
         type: Sequelize.STRING,
+      },
+      examDate: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      createdBy: {
+        type: Sequelize.INTEGER,
+        references: 'Users',
+        referencesKey: 'id',
       },
       createdAt: {
         allowNull: false,
