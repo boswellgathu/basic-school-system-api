@@ -1,22 +1,14 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Exams', {
+    return queryInterface.createTable('Classes', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        allowNull: false,
-        type: Sequelize.STRING,
-      },
-      examDate: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      createdBy: {
+      teacher: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Users',
@@ -37,10 +29,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-      },
+      }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Exams');
+    return queryInterface.dropTable('Classes');
   }
 };

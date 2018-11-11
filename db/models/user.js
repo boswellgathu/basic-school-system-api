@@ -6,9 +6,13 @@ module.exports = (sequelize, DataTypes) => {
     lastName: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
+      allowNull: false,
       unique: true,
     },
-    address: DataTypes.STRING,
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   }, {});
   User.associate = (models) => {
     User.hasOne(models.Role);

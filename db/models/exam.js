@@ -6,8 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     examDate: DataTypes.DATE,
     createdBy: {
       type: DataTypes.INTEGER,
-      references: 'Users',
-      referencesKey: 'id',
+      references: {
+        model: 'User',
+        key: 'id',
+      },
     },
   }, {});
   Exam.associate = function(models) {
