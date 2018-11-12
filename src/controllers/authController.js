@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { User } = require('../../db/models');
 const { pubCert, priCert } = require('../../config');
 
 /**
@@ -35,6 +36,25 @@ class AuthHandler {
         message: 'No token provided.',
       });
     }
+  }
+
+  /**
+   * IsAdmin
+   *
+   * Check if current user has the admin role
+   *
+   * @param {object} req The request object
+   * @param {object} res The response object
+   * @param {function} next The callback function
+   * @returns {object} res The response object
+   */
+  static async IsAdmin(req, res, next) {
+    const { userId } = req.decoded.userId;
+    const user = await User.findOne({
+      where: { id: userId },
+      include: [{ model: 'Role' }],
+    });
+    console.log(user);
   }
 
   /**

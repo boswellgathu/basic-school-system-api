@@ -25,6 +25,7 @@
     "eslint-plugin-react": "^7.11.1"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "chokidar": "^2.0.4",
     "dotenv": "^6.1.0",

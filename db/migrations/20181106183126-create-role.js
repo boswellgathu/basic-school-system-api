@@ -11,14 +11,17 @@ module.exports = {
       name: {
         type: Sequelize.ENUM,
         values: ['admin', 'teacher', 'student'],
+        unique: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(),
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(),
       }
     });
   },
