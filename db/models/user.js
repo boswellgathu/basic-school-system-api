@@ -15,22 +15,17 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {});
   User.associate = (models) => {
-    User.hasOne(models.Role);
+    User.belongsTo(models.Role, { foreignKey: 'roleId' });
   };
   User.prototype.authenticate = (password) => {
     bcrypt.compare(password, this.password, (err, res) => {
       return res;
     });
   };
-  User.beforeCreate((user) => {
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(user.password, salt, (error, hash) => {
-        if (error) {
-          throw new Error('Error occured while try to save user to db');
-        }
-        user.password = hash;
-      });
-    });
+  User.beforeCreate(async (user) => {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(user.password, salt);
+    user.password = hash;
   });
   return User;
 };

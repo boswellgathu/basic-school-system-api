@@ -8,8 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       values: ['A', 'B', 'C', 'D', 'E'],
     },
     status: DataTypes.BOOLEAN,
-    dateCreated: DataTypes.Date,
-    dateModified: DataTypes.Date,
+    dateCreated: DataTypes.DATE,
+    dateModified: DataTypes.DATE,
   }, {});
   Grade.associate = function (models) {
   };

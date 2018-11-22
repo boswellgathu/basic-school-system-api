@@ -12,6 +12,7 @@ module.exports = {
         type: Sequelize.ENUM,
         values: ['admin', 'teacher', 'student'],
         unique: true,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

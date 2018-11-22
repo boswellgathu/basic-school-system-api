@@ -1,6 +1,9 @@
+const fs = require('fs');
+const path = require('path');
 const jwt = require('jsonwebtoken');
 const { User } = require('../../db/models');
-const { pubCert, priCert } = require('../../config');
+
+const priCert = fs.readFileSync(path.resolve(__dirname, '../utils/configs/private.key'), 'utf8');
 
 /**
  * AuthHandler

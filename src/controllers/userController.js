@@ -1,6 +1,4 @@
-const { validateUserData } = require('../services/users');
-const { User } = require('../../db/models');
-
+const { validateUserData, verifyPassword, addUser } = require('../services/users');
 
 const CreateUser = (req, res) => {
   const sanitizedData = validateUserData(req.body);
@@ -9,15 +7,13 @@ const CreateUser = (req, res) => {
     return res.status(400).send({ validationError: sanitizedData });
   }
 
-  return User
-    .create({
-      firstName: sanitizedData.firstName,
-      lastName: sanitizedData.lastName,
-      userName: sanitizedData.lastName,
-      email: sanitizedData.email,
-    })
-    .then(todo => res.status(201).send(todo))
-    .catch(error => res.status(400).send({ Error: error.parent.detail }));
+  if (!verifyPassword(req.body)) {
+    return res.status(400).send({ validationError: 'password and confirm password don\'t match' });
+  }
+
+  const { response, statusCode } = addUser(sanitizedData);
+  console.log(response, statusCode);
+  return res.status(statusCode).send(response);
 };
 
 module.exports = {

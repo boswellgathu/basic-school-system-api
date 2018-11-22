@@ -7,10 +7,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM,
       values: ['admin', 'teacher', 'student'],
       unique: true,
+      alowNull: false,
     },
   }, {});
   Role.associate = function (models) {
     // associations can be defined here
+    Role.hasMany(models.User);
   };
   return Role;
 };

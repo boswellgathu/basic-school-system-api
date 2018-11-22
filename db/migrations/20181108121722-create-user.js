@@ -19,12 +19,16 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
       },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       roleId: {
         type: Sequelize.INTEGER,
-        references: {
-          model: 'Roles',
-          key: 'id',
-        },
+        // references: {
+        //   model: 'Roles',
+        //   key: 'id',
+        // },
       },
       createdAt: {
         allowNull: false,
