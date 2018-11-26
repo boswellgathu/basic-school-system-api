@@ -1,4 +1,4 @@
-const { validateUserData, verifyPassword, addUser } = require('../services/users');
+const { validateUserData, verifyPassword, addUser } = require('../../services/users');
 
 const CreateUser = async (req, res) => {
   const sanitizedData = validateUserData(req.body);

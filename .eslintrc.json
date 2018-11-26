@@ -2,6 +2,12 @@
     "extends": "airbnb",
     "rules": {
       "no-param-reassign": [2, { "props": false }],
-      "comma-dangle": 0
+      "comma-dangle": 0,
+      "import/no-extraneous-dependencies": 0
+    },
+    "env": {
+      "commonjs": true,
+      "node": true,
+      "mocha": true
     }
 }

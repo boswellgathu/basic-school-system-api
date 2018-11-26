@@ -1,7 +1,7 @@
 const validator = require('validator');
-const { User } = require('../../db/models');
-const generateToken = require('../controllers/authController').GenerateToken;
-const { catchErrors } = require('../utils/errorHandlers');
+const { User } = require('../../../db/models');
+const generateToken = require('../../controllers/authController').GenerateToken;
+const { catchErrors } = require('../../utils/errorHandlers');
 
 /**
  *
@@ -45,7 +45,7 @@ const addUser = async (user) => {
       roleId: 1,
     }));
     if (err) {
-      if (err.name.toLowerCase().includes('Sequelize')) {
+      if (err.name.toLowerCase().includes('sequelize')) {
         return { statusCode: 400, response: { Error: { [err.name]: err.parent.detail } } };
       }
       return { statusCode: 400, response: { Error: { [err.name]: err.message } } };

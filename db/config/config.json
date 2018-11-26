@@ -4,14 +4,17 @@
     "password": null,
     "database": "assessment",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "operatorsAliases": false
   },
   "test": {
     "username": "boswellgathu",
     "password": null,
-    "database": "database_test",
+    "database": "test_assessment",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "logging": false,
+    "operatorsAliases": false
   },
   "production": {
     "username": "boswellgathu",
