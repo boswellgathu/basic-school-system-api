@@ -1,7 +1,13 @@
 const validator = require('validator');
 const { User } = require('../../db/models');
 const generateToken = require('../controllers/authController').GenerateToken;
+const { catchErrors } = require('../utils/errorHandlers');
 
+/**
+ *
+ * @param {object} userData - contains all user data in req.body
+ * @returns {object} - validated userData
+ */
 const validateUserData = (userData) => {
   if (!validator.isEmail(userData.email)) {
     return 'Email provided is invalid';
@@ -23,19 +29,28 @@ const verifyPassword = (userData) => {
   return false;
 };
 
+/**
+ *
+ * Adds user to the db
+ * @param {object} user - user object
+ * @returns {object} - status code and response - ceated user || error object
+ */
 const addUser = async (user) => {
   try {
-    const res = await User.create({
+    const [err, data] = await catchErrors(User.create({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       password: user.password,
       roleId: 1,
-    });
-    // .catch(err => ({ statusCode: 400, response: { Error: { [err.name]: err.message } } }));
-    // res = res.dataValues;
-    console.log('this is res: ', res);
-
+    }));
+    if (err) {
+      if (err.name.toLowerCase().includes('Sequelize')) {
+        return { statusCode: 400, response: { Error: { [err.name]: err.parent.detail } } };
+      }
+      return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
+    }
+    const res = data.toJSON();
     const userData = {
       id: res.id,
       firstName: res.firstName,
