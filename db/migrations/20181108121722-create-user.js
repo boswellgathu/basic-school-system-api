@@ -25,19 +25,21 @@ module.exports = {
       },
       roleId: {
         type: Sequelize.INTEGER,
-        // TODO: update this!
-        // references: {
-        //   model: 'Roles',
-        //   key: 'id',
-        // },
+        allowNull: false,
+        references: {
+          model: 'Roles',
+          key: 'id',
+        },
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: new Date(),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: new Date(),
       },
     });
   },

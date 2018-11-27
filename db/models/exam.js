@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Exam.associate = (models) => {
     Exam.hasOne(models.Subject, { as: 'subjectId' });
-    Exam.hasOne(models.User, { as: 'studentId' });
+    Exam.belongsTo(models.User, { as: 'studentId' });
   };
   return Exam;
 };
