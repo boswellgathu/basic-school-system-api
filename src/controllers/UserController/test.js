@@ -4,13 +4,16 @@ const { User, Role } = require('../../../db/models');
 const app = require('../../../index');
 
 describe('users', () => {
-  let user = {
-    firstName: 'jwt',
-    lastName: 'test',
-    email: 'jwt.test34@gmail.com',
-    password: '123Qwerty',
-    confirmPassword: '123Qwerty'
-  };
+  let user;
+  beforeEach(() => {
+    user = {
+      firstName: 'jwt',
+      lastName: 'test',
+      email: 'jwt.test34@gmail.com',
+      password: '123Qwerty',
+      confirmPassword: '123Qwerty'
+    };
+  });
 
   before(() => Role.bulkCreate([
     { name: 'admin' },
@@ -60,6 +63,34 @@ describe('users', () => {
         expect(res.body.token).toBeUndefined();
         expect(res.body)
           .toEqual({ validationError: "password and confirm password don't match" });
+        done();
+      });
+  });
+
+  it('POST api/user/signin', (done) => {
+    request(app)
+      .post('/api/user/signin')
+      .send({ email: user.email, password: user.password })
+      .set('Accept', 'application/json')
+      .expect(200)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.body.token).toBeDefined();
+        expect(res.body.email).toBe(user.email);
+        done();
+      });
+  });
+
+  it('POST api/user/signin - wrong password/username', (done) => {
+    request(app)
+      .post('/api/user/signin')
+      .send({ email: user.email, password: 'pahala-peponi' })
+      .set('Accept', 'application/json')
+      .expect(400)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.body.token).toBeUndefined();
+        expect(res.body).toEqual({ message: 'wrong username or password' });
         done();
       });
   });
@@ -117,4 +148,5 @@ describe('users', () => {
         done();
       });
   });
+
 });

@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const { User } = require('../../../db/models');
 const generateToken = require('../../controllers/AuthController').GenerateToken;
@@ -43,6 +44,39 @@ const userExists = async (userId) => {
       return false;
     }
     return true;
+  } catch (err) {
+    return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
+  }
+};
+
+/**
+ *
+ * Aauthenticates user
+ *
+ * @param {object} user - user object
+ * @returns {object} - status code and response - ceated user || error object
+ */
+const authenticate = async (user) => {
+  try {
+    const [err, data] = await catchErrors(User.findOne({ where: { email: user.email } }));
+    if (err) {
+      return { statusCode: 400, response: { Error: err.toString() } };
+    }
+    if (!data) {
+      return { statusCode: 400, response: { message: 'wrong username or password' } };
+    }
+
+    const res = data.toJSON();
+    if (await bcrypt.compare(user.password, res.password)) {
+      const userData = {
+        firstName: res.firstName,
+        lastName: res.lastName,
+        email: res.email,
+        token: generateToken({ id: res.id }),
+      };
+      return { statusCode: 200, response: userData };
+    }
+    return { statusCode: 400, response: { message: 'wrong username or password' } };
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
@@ -101,7 +135,7 @@ const putUser = async (user) => {
       };
     }
 
-    const [err, data] = await catchErrors(User.update(user, { where: { id: user.id } }));
+    const [err, data] = await catchErrors(User.update(user, { individualHooks: true, where: { id: user.id } }));
     if (err) {
       return { statusCode: 400, response: { Error: err.toString() } };
     }
@@ -144,6 +178,7 @@ const removeUser = async (user) => {
 module.exports = {
   validateUserData,
   verifyPassword,
+  authenticate,
   addUser,
   putUser,
   removeUser,

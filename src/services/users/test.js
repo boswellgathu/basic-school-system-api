@@ -1,7 +1,11 @@
 const expect = require('expect');
 const { User } = require('../../../db/models');
 const {
-  validateUserData, verifyPassword, addUser, userExists
+  validateUserData,
+  verifyPassword,
+  addUser,
+  userExists,
+  authenticate
 } = require('./');
 
 const fetchUser = async (email) => {

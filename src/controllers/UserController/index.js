@@ -3,9 +3,28 @@ const {
   verifyPassword,
   addUser,
   putUser,
-  removeUser
+  removeUser,
+  authenticate
 } = require('../../services/users');
 
+
+/**
+ *Controller to authenticate user
+ *
+ * @param {object} req
+ * @param {object} res
+ * @returns
+ */
+const signIn = async (req, res) => {
+  const sanitizedData = validateUserData(req.body);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+
+  const { response, statusCode } = await authenticate(sanitizedData);
+  return res.status(statusCode).send(response);
+};
 
 /**
  *Controller to create a user
@@ -70,6 +89,7 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
+  signIn,
   createUser,
   updateUser,
   deleteUser
