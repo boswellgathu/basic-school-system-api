@@ -6,9 +6,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
     },
-    
   }, {});
-  Subject.associate = function(models) {
+  Subject.associate = (models) => {
+    Subject.belongsTo(models.User, { as: 'teacherId' });
   };
   return Subject;
 };

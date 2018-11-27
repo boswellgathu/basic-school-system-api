@@ -2,18 +2,16 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Exam = sequelize.define('Exam', {
-    name: DataTypes.STRING,
     examDate: DataTypes.DATE,
-    createdBy: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'User',
-        key: 'id',
-      },
-    },
+    grade: {
+      type: DataTypes.ENUM,
+      values: ['A', 'B', 'C', 'D', 'E'],
+      allowNull: false,
+    }
   }, {});
-  Exam.associate = function(models) {
-    Exam.hasMany(models.Subject);
+  Exam.associate = (models) => {
+    Exam.hasOne(models.Subject, { as: 'subjectId' });
+    Exam.hasOne(models.User, { as: 'studentId' });
   };
   return Exam;
 };

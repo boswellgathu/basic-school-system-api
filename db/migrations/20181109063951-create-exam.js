@@ -8,22 +8,23 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        allowNull: false,
-        type: Sequelize.STRING,
-      },
       examDate: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      createdBy: {
+      grade: {
+        type: Sequelize.ENUM,
+        values: ['A', 'B', 'C', 'D', 'E'],
+        allowNull: false,
+      },
+      subjectId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Users',
+          model: 'Subjects',
           key: 'id',
         },
       },
-      subjectId: {
+      studentId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Subjects',
