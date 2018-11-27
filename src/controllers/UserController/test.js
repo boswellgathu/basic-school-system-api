@@ -1,5 +1,6 @@
 const request = require('supertest');
 const expect = require('expect');
+const { User, Role } = require('../../../db/models');
 const app = require('../../../index');
 
 describe('users', () => {
@@ -10,6 +11,14 @@ describe('users', () => {
     password: '123Qwerty',
     confirmPassword: '123Qwerty'
   };
+
+  before(() => Role.bulkCreate([
+    { name: 'admin' },
+    { name: 'teacher' },
+    { name: 'student' }
+  ]));
+
+  after(() => User.destroy({ truncate: true, cascade: true }));
 
   it('POST api/user', (done) => {
     request(app)
@@ -34,8 +43,7 @@ describe('users', () => {
       .end((err, res) => {
         if (err) done(err);
         expect(res.body.token).toBeUndefined();
-        expect(res.body.Error)
-          .toEqual({ SequelizeUniqueConstraintError: `Key (email)=(${user.email}) already exists.` });
+        expect(res.body.Error).toBe('SequelizeUniqueConstraintError: Validation error');
         done();
       });
   });
@@ -52,6 +60,60 @@ describe('users', () => {
         expect(res.body.token).toBeUndefined();
         expect(res.body)
           .toEqual({ validationError: "password and confirm password don't match" });
+        done();
+      });
+  });
+
+  it('PUT api/user:id', (done) => {
+    user = { ...user, email: 'updated@gmail.com' };
+    request(app)
+      .put('/api/user/1')
+      .send(user)
+      .set('Accept', 'application/json')
+      .expect(200)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.body).toEqual({ message: 'User updated successfully' });
+        done();
+      });
+  });
+
+  it('PUT api/user:id user not found', (done) => {
+    user = { ...user, email: 'updated@gmail.com' };
+    request(app)
+      .put('/api/user/345')
+      .send(user)
+      .set('Accept', 'application/json')
+      .expect(404)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.body).toEqual({ Error: 'User: 345 does not exist' });
+        done();
+      });
+  });
+
+  it('DELETE api/user:id', (done) => {
+    request(app)
+      .delete('/api/user/1')
+      .send(user)
+      .set('Accept', 'application/json')
+      .expect(200)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.body).toEqual({ message: 'User deleted successfully' });
+        done();
+      });
+  });
+
+  it('DELETE api/user:id user not found', (done) => {
+    request(app)
+      .delete('/api/user/345')
+      .send(user)
+      .set('Accept', 'application/json')
+      .expect(404)
+      .end((err, res) => {
+        if (err) done(err);
+        expect(res.body).toEqual({ Error: 'User: 345 does not exist' });
         done();
       });
   });

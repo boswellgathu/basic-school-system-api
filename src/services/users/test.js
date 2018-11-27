@@ -1,7 +1,13 @@
 const expect = require('expect');
-const { catchErrors } = require('../../utils/errorHandlers');
-const { validateUserData, verifyPassword, addUser } = require('./');
+const { User } = require('../../../db/models');
+const {
+  validateUserData, verifyPassword, addUser, userExists
+} = require('./');
 
+const fetchUser = async (email) => {
+  const found = await User.findOne({ where: { email } });
+  return found.toJSON();
+};
 
 describe('user service', () => {
   let user;
@@ -56,7 +62,17 @@ describe('user service', () => {
     const actual = await addUser(user);
     expect(actual.response.token).toBeUndefined();
     expect(actual.statusCode).toBe(400);
-    expect(actual.response.Error)
-      .toEqual({ SequelizeUniqueConstraintError: `Key (email)=(${user.email}) already exists.` });
+    expect(actual.response.Error).toBe('SequelizeUniqueConstraintError: Validation error');
+  });
+
+  it('userExists', async () => {
+    const expectedUser = await fetchUser(user.email);
+    const actual = await userExists(expectedUser.id);
+    expect(actual).toBeTruthy();
+  });
+
+  it('userExists - user not found', async () => {
+    const actual = await userExists(40005074646);
+    expect(actual).toBeFalsy();
   });
 });

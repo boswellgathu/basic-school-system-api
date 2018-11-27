@@ -2,10 +2,12 @@
  * Created by boswellgathu on 30/03/2017.
  */
 const express = require('express');
-const { CreateUser } = require('../controllers/userController');
+const { createUser, updateUser, deleteUser } = require('../controllers/UserController');
 
 const UserRouter = express.Router();
 
-UserRouter.post('/user', CreateUser);
+UserRouter.post('/user', createUser);
+UserRouter.put('/user/:id', updateUser);
+UserRouter.delete('/user/:id', deleteUser);
 
 module.exports = UserRouter;

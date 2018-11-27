@@ -25,6 +25,7 @@ module.exports = {
       },
       roleId: {
         type: Sequelize.INTEGER,
+        // TODO: update this!
         // references: {
         //   model: 'Roles',
         //   key: 'id',

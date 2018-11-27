@@ -1,6 +1,20 @@
-const { validateUserData, verifyPassword, addUser } = require('../../services/users');
+const {
+  validateUserData,
+  verifyPassword,
+  addUser,
+  putUser,
+  removeUser
+} = require('../../services/users');
 
-const CreateUser = async (req, res) => {
+
+/**
+ *Controller to create a user
+ *
+ * @param {object} req
+ * @param {object} res
+ * @returns
+ */
+const createUser = async (req, res) => {
   const sanitizedData = validateUserData(req.body);
 
   if (typeof sanitizedData === 'string') {
@@ -17,6 +31,46 @@ const CreateUser = async (req, res) => {
   return res.status(statusCode).send(response);
 };
 
+/**
+ *Controller to update a user
+ *
+ * @param {object} req
+ * @param {object} res
+ * @returns
+ */
+const updateUser = async (req, res) => {
+  const user = { ...req.body, id: req.params.id };
+  const sanitizedData = validateUserData(user);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+
+  const { response, statusCode } = await putUser(sanitizedData);
+  return res.status(statusCode).send(response);
+};
+
+/**
+ *Controller to delete a user
+ *
+ * @param {object} req
+ * @param {object} res
+ * @returns
+ */
+const deleteUser = async (req, res) => {
+  const user = { id: req.params.id };
+  const sanitizedData = validateUserData(user);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+
+  const { response, statusCode } = await removeUser(sanitizedData);
+  return res.status(statusCode).send(response);
+};
+
 module.exports = {
-  CreateUser,
+  createUser,
+  updateUser,
+  deleteUser
 };
