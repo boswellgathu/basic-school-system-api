@@ -1,13 +1,13 @@
 /* eslint-disable func-names */
-
+const { roleEnum, STUDENT } = require('../constants');
 
 module.exports = (sequelize, DataTypes) => {
   const Role = sequelize.define('Role', {
     name: {
       type: DataTypes.ENUM,
-      values: ['admin', 'teacher', 'student'],
+      values: roleEnum,
       unique: true,
-      alowNull: false,
+      defaultValue: STUDENT
     },
   }, {});
   Role.associate = function (models) {

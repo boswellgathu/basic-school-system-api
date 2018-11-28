@@ -15,7 +15,7 @@ const {
  * @param {object} res
  * @returns
  */
-const signIn = async (req, res) => {
+async function signIn(req, res) {
   const sanitizedData = validateUserData(req.body);
 
   if (typeof sanitizedData === 'string') {
@@ -24,7 +24,7 @@ const signIn = async (req, res) => {
 
   const { response, statusCode } = await authenticate(sanitizedData);
   return res.status(statusCode).send(response);
-};
+}
 
 /**
  *Controller to create a user
@@ -33,7 +33,7 @@ const signIn = async (req, res) => {
  * @param {object} res
  * @returns
  */
-const createUser = async (req, res) => {
+async function createUser(req, res) {
   const sanitizedData = validateUserData(req.body);
 
   if (typeof sanitizedData === 'string') {
@@ -48,7 +48,7 @@ const createUser = async (req, res) => {
 
   const { response, statusCode } = await addUser(sanitizedData);
   return res.status(statusCode).send(response);
-};
+}
 
 /**
  *Controller to update a user
@@ -57,7 +57,7 @@ const createUser = async (req, res) => {
  * @param {object} res
  * @returns
  */
-const updateUser = async (req, res) => {
+async function updateUser(req, res) {
   const user = { ...req.body, id: req.params.id };
   const sanitizedData = validateUserData(user);
 
@@ -67,7 +67,7 @@ const updateUser = async (req, res) => {
 
   const { response, statusCode } = await putUser(sanitizedData);
   return res.status(statusCode).send(response);
-};
+}
 
 /**
  *Controller to delete a user
@@ -76,7 +76,7 @@ const updateUser = async (req, res) => {
  * @param {object} res
  * @returns
  */
-const deleteUser = async (req, res) => {
+async function deleteUser(req, res) {
   const user = { id: req.params.id };
   const sanitizedData = validateUserData(user);
 
@@ -86,7 +86,7 @@ const deleteUser = async (req, res) => {
 
   const { response, statusCode } = await removeUser(sanitizedData);
   return res.status(statusCode).send(response);
-};
+}
 
 module.exports = {
   signIn,

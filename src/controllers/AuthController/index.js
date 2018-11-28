@@ -3,6 +3,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const { catchErrors } = require('../../utils/errorHandlers');
 const { User, Role } = require('../../../db/models');
+const { ADMIN } = require('../../../db/constants');
 
 const priCert = fs.readFileSync(path.resolve(__dirname, '../../utils/configs/private.key'), 'utf8');
 const pubCert = fs.readFileSync(path.resolve(__dirname, '../../utils/configs/public.key'), 'utf8');
@@ -63,7 +64,7 @@ async function IsAdmin(req, res, next) {
   }
 
   const role = user.toJSON().Role;
-  if (user.id === id && role && role.name === 'admin') {
+  if (role && role.name === ADMIN) {
     next();
   } else {
     return res.status(403).send({

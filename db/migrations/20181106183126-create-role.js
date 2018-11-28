@@ -1,3 +1,4 @@
+const { roleEnum, STUDENT } = require('../constants');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -10,9 +11,9 @@ module.exports = {
       },
       name: {
         type: Sequelize.ENUM,
-        values: ['admin', 'teacher', 'student'],
+        values: roleEnum,
         unique: true,
-        allowNull: false,
+        defaultValue: STUDENT
       },
       createdAt: {
         allowNull: false,

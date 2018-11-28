@@ -11,7 +11,7 @@ const { fetchStudentRole } = require('../../utils/dbUtils');
  * @param {object} userData - contains all user data in req.body
  * @returns {object} - validated userData
  */
-const validateUserData = (userData) => {
+function validateUserData(userData) {
   if (userData.email && !validator.isEmail(userData.email)) {
     return 'Email provided is invalid';
   }
@@ -19,15 +19,15 @@ const validateUserData = (userData) => {
     userData[field] = validator.escape(userData[field].toString());
   });
   return userData;
-};
+}
 
-const verifyPassword = (userData) => {
+function verifyPassword(userData) {
   const { password, confirmPassword } = userData;
   if (password === confirmPassword) {
     return true;
   }
   return false;
-};
+}
 
 /**
  * Check if user with given userId exists
@@ -35,7 +35,7 @@ const verifyPassword = (userData) => {
  * @param {number} userId - id of the user being checked
  * @returns object | boolean
  */
-const userExists = async (userId) => {
+async function userExists(userId) {
   try {
     const [err, data] = await catchErrors(User.findOne({ where: { id: userId } }));
     if (err) {
@@ -48,7 +48,7 @@ const userExists = async (userId) => {
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
-};
+}
 
 /**
  *
@@ -57,7 +57,7 @@ const userExists = async (userId) => {
  * @param {object} user - user object
  * @returns {object} - status code and response - ceated user || error object
  */
-const authenticate = async (user) => {
+async function authenticate(user) {
   try {
     const [err, data] = await catchErrors(User.findOne({ where: { email: user.email } }));
     if (err) {
@@ -81,7 +81,7 @@ const authenticate = async (user) => {
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
-};
+}
 
 /**
  *
@@ -90,7 +90,7 @@ const authenticate = async (user) => {
  * @param {object} user - user object
  * @returns {object} - status code and response - ceated user || error object
  */
-const addUser = async (user) => {
+async function addUser(user) {
   try {
     const [err, data] = await catchErrors(User.create({
       firstName: user.firstName,
@@ -113,7 +113,7 @@ const addUser = async (user) => {
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
-};
+}
 
 /**
  *
@@ -122,7 +122,7 @@ const addUser = async (user) => {
  * @param {object} user - user object
  * @returns {object} - status code and response
  */
-const putUser = async (user) => {
+async function putUser(user) {
   try {
     const checkUser = await userExists(user.id);
     if (typeof checkUser === 'object') {
@@ -135,7 +135,9 @@ const putUser = async (user) => {
       };
     }
 
-    const [err, data] = await catchErrors(User.update(user, { individualHooks: true, where: { id: user.id } }));
+    const [err, data] = await catchErrors(
+      User.update(user, { individualHooks: true, where: { id: user.id } })
+    );
     if (err) {
       return { statusCode: 400, response: { Error: err.toString() } };
     }
@@ -143,7 +145,7 @@ const putUser = async (user) => {
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
-};
+}
 
 /**
  *
@@ -152,7 +154,7 @@ const putUser = async (user) => {
  * @param {object} user - user object
  * @returns {object} - status code and response
  */
-const removeUser = async (user) => {
+async function removeUser(user) {
   try {
     const checkUser = await userExists(user.id);
     if (typeof checkUser === 'object') {
@@ -173,7 +175,7 @@ const removeUser = async (user) => {
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
-};
+}
 
 module.exports = {
   validateUserData,
