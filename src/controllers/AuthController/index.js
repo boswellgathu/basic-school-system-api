@@ -53,8 +53,12 @@ async function IsAdmin(req, res, next) {
   }));
   if (err) {
     return res.status(500).send({
-      message: 'An error occured',
-      err
+      message: 'An error occured, please try again later'
+    });
+  }
+  if (!user) {
+    return res.status(500).send({
+      message: 'Access denied'
     });
   }
 
@@ -63,8 +67,7 @@ async function IsAdmin(req, res, next) {
     next();
   } else {
     return res.status(403).send({
-      message: 'Not authorised to add user',
-      err
+      message: 'Not authorised to perform this action'
     });
   }
 }

@@ -8,7 +8,7 @@ const UserRouter = express.Router();
 
 UserRouter.post('/user', VerifyToken, IsAdmin, createUser);
 UserRouter.post('/user/signin', signIn);
-UserRouter.put('/user/:id', updateUser);
-UserRouter.delete('/user/:id', deleteUser);
+UserRouter.put('/user/:id', VerifyToken, IsAdmin, updateUser);
+UserRouter.delete('/user/:id', VerifyToken, IsAdmin, deleteUser);
 
 module.exports = UserRouter;
