@@ -1,11 +1,11 @@
 const expect = require('expect');
 const { fetchUser } = require('../../utils/dbUtils');
 const {
-  validateUserData,
   verifyPassword,
   addUser,
   userExists
 } = require('./');
+const { validateUserData } = require('../../utils/dataValidateUtils');
 
 
 describe('user service', () => {

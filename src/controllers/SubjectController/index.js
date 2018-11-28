@@ -1,23 +1,64 @@
-const { Subject } = require('../../../db/models');
+const { validateUserData } = require('../../utils/dataValidateUtils');
+const {
+  addSubject,
+  patchSubject,
+  archiveSubject,
+  assignSubjectToTeacher,
+  reassignSubjectToTeacher
+} = require('../../services/subject');
 
-function createSubject(req, res) {
-  //
+async function createSubject(req, res) {
+  const sanitizedData = validateUserData(req.body);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+  const { response, statusCode } = await addSubject(sanitizedData);
+  return res.status(statusCode).send(response);
 }
 
-function updateSubject(req, res) {
-  //
+async function updateSubject(req, res) {
+  const subject = { ...req.body, id: req.params.id };
+  const sanitizedData = validateUserData(subject);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+  const { response, statusCode } = await patchSubject(sanitizedData);
+  return res.status(statusCode).send(response);
 }
 
-function deleteSubject(req, res) {
-  //
+async function deleteSubject(req, res) {
+  const subject = { id: req.params.id };
+  const sanitizedData = validateUserData(subject);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+  const { response, statusCode } = await archiveSubject(sanitizedData.id);
+  return res.status(statusCode).send(response);
 }
 
-function assignTeacher(req, res) {
-  //
+async function assignTeacher(req, res) {
+  const subject = { ...req.body, id: req.params.id };
+  const sanitizedData = validateUserData(subject);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+  const { response, statusCode } = await assignSubjectToTeacher(sanitizedData);
+  return res.status(statusCode).send(response);
 }
 
-function reassignTeacher(req, res) {
-  //
+async function reassignTeacher(req, res) {
+  const subject = { ...req.body, id: req.params.id };
+  const sanitizedData = validateUserData(subject);
+
+  if (typeof sanitizedData === 'string') {
+    return res.status(400).send({ validationError: sanitizedData });
+  }
+  const { response, statusCode } = await reassignSubjectToTeacher(sanitizedData);
+  return res.status(statusCode).send(response);
 }
 
 

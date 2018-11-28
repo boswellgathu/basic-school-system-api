@@ -1,5 +1,5 @@
+const { validateUserData } = require('../../utils/dataValidateUtils');
 const {
-  validateUserData,
   verifyPassword,
   addUser,
   putUser,
