@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const { User } = require('../../../db/models');
-const generateToken = require('../../controllers/AuthController').GenerateToken;
+const { generateToken } = require('../../controllers/AuthController');
 const { catchErrors } = require('../../utils/errorHandlers');
+const { fetchStudentRole } = require('../../utils/dbUtils');
 
 /**
  *
@@ -15,7 +16,7 @@ const validateUserData = (userData) => {
     return 'Email provided is invalid';
   }
   Object.keys(userData).map((field) => {
-    userData[field] = validator.escape(userData[field]);
+    userData[field] = validator.escape(userData[field].toString());
   });
   return userData;
 };
@@ -96,7 +97,7 @@ const addUser = async (user) => {
       lastName: user.lastName,
       email: user.email,
       password: user.password,
-      roleId: 1,
+      roleId: user.roleId || await fetchStudentRole(),
     }));
     if (err) {
       return { statusCode: 400, response: { Error: err.toString() } };
@@ -106,8 +107,7 @@ const addUser = async (user) => {
       id: res.id,
       firstName: res.firstName,
       lastName: res.lastName,
-      email: res.email,
-      token: generateToken({ id: res.id }),
+      email: res.email
     };
     return { statusCode: 201, response: userData };
   } catch (err) {

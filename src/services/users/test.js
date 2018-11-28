@@ -1,17 +1,12 @@
 const expect = require('expect');
-const { User } = require('../../../db/models');
+const { fetchUser } = require('../../utils/dbUtils');
 const {
   validateUserData,
   verifyPassword,
   addUser,
-  userExists,
-  authenticate
+  userExists
 } = require('./');
 
-const fetchUser = async (email) => {
-  const found = await User.findOne({ where: { email } });
-  return found.toJSON();
-};
 
 describe('user service', () => {
   let user;
@@ -56,7 +51,6 @@ describe('user service', () => {
 
   it('addUser', async () => {
     const actual = await addUser(user);
-    expect(actual.response.token).toBeDefined();
     expect(actual.response.id).toBeDefined();
     expect(actual.response.email).toBe(user.email);
     expect(actual.statusCode).toBe(201);
@@ -64,7 +58,6 @@ describe('user service', () => {
 
   it('addUser error - SequelizeUniqueConstraintError', async () => {
     const actual = await addUser(user);
-    expect(actual.response.token).toBeUndefined();
     expect(actual.statusCode).toBe(400);
     expect(actual.response.Error).toBe('SequelizeUniqueConstraintError: Validation error');
   });

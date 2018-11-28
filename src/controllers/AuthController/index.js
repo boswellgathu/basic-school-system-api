@@ -77,7 +77,7 @@ async function IsAdmin(req, res, next) {
  * @param {object} user The user object
  * @returns {string} token
  */
-function GenerateToken(user) {
+function generateToken(user) {
   return jwt.sign(user, priCert, {
     expiresIn: '24h',
     algorithm: 'RS256',
@@ -87,5 +87,5 @@ function GenerateToken(user) {
 module.exports = {
   VerifyToken,
   IsAdmin,
-  GenerateToken
+  generateToken
 };
