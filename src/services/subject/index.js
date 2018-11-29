@@ -1,9 +1,11 @@
 const { Subject } = require('../../../db/models');
-const { LIVE, ARCHIVED } = require('../../../db/constants')
-const { catchErrors } = require('../../utils/errorHandlers');
+const { LIVE, ARCHIVED } = require('../../../db/constants');
+const errorHandlers = require('../../utils/errorHandlers');
 
 
 /**
+ * subjectExists
+ *
  * Check if subject with given subjectId exists
  *
  * @param {number} subjectId - id of the subject being checked
@@ -11,8 +13,8 @@ const { catchErrors } = require('../../utils/errorHandlers');
  */
 async function subjectExists(subjectId) {
   try {
-    const [err, data] = await catchErrors(
-      Subject.findOne({ where: { id: subjectId } })
+    const [err, data] = await errorHandlers.catchErrors(
+      Subject.findOne({ where: { id: subjectId }, raw: true })
     );
     if (err) {
       return { statusCode: 500, response: { Error: err.toString() } };
@@ -20,28 +22,31 @@ async function subjectExists(subjectId) {
     if (!data) {
       return false;
     }
-    return data.toJSON();
+    return data;
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
 }
 
 /**
+ * addSubject
  *
+ * Adds a subject to the db
  *
- * @param {*} subject
+ * @param {object} subject - contains most of fields required
+ * @returns {object} - status code and response - subject | error object
  */
 async function addSubject(subject) {
   if (subject.teacherId) {
     subject.status = LIVE;
   }
-
   try {
-    const [err, data] = await catchErrors(Subject.create({ subject }));
+    const [err, res] = await errorHandlers.catchErrors(
+      Subject.create(subject, { raw: true })
+    );
     if (err) {
       return { statusCode: 400, response: { Error: err.toString() } };
     }
-    const res = data.toJSON();
     const subjectData = {
       id: res.id,
       name: res.name,
@@ -55,14 +60,17 @@ async function addSubject(subject) {
 }
 
 /**
+ * patchSubject
  *
+ * Updates the name of a subject
  *
- * @param {*} subject
+ * @param {object} subject - subject name and id
+ * @returns {object} - status code and response - subject | error object
  */
 async function patchSubject(subject) {
   try {
     const checkSubject = await subjectExists(subject.id);
-    if (typeof checkSubject === 'object') {
+    if (typeof checkSubject === 'object' && checkSubject.statusCode) {
       return checkSubject;
     }
     if (!checkSubject) {
@@ -72,16 +80,17 @@ async function patchSubject(subject) {
       };
     }
 
-    const [err, data] = await catchErrors(
+    const [err, data] = await errorHandlers.catchErrors(
       Subject.update(
         { name: subject.name },
-        { where: { id: subject.id }, returning: true }
+        { where: { id: subject.id }, returning: true, raw: true }
       )
     );
     if (err) {
       return { statusCode: 400, response: { Error: err.toString() } };
     }
-    const res = data.toJSON();
+
+    const res = data[1][0];
     const subjectData = {
       id: res.id,
       name: res.name,
@@ -95,14 +104,17 @@ async function patchSubject(subject) {
 }
 
 /**
+ * archiveSubject
  *
+ * archives specified subject - to change status to archived
  *
- * @param {*} subjectId
+ * @param {number} subjectId - id of specified subject
+ * @returns {object} - status code and response - subject | error object
  */
 async function archiveSubject(subjectId) {
   try {
     const checkSubject = await subjectExists(subjectId);
-    if (typeof checkSubject === 'object') {
+    if (typeof checkSubject === 'object' && checkSubject.statusCode) {
       return checkSubject;
     }
     if (!checkSubject) {
@@ -112,16 +124,16 @@ async function archiveSubject(subjectId) {
       };
     }
 
-    const [err, data] = await catchErrors(
+    const [err, data] = await errorHandlers.catchErrors(
       Subject.update(
         { status: ARCHIVED },
-        { where: { id: subjectId }, returning: true }
+        { where: { id: subjectId }, returning: true, raw: true }
       )
     );
     if (err) {
       return { statusCode: 400, response: { Error: err.toString() } };
     }
-    const res = data.toJSON();
+    const res = data[1][0];
     const subjectData = {
       id: res.id,
       name: res.name,
@@ -135,17 +147,19 @@ async function archiveSubject(subjectId) {
 }
 
 /**
+ * assignSubjectToTeacher
  *
+ * assigns a validation subject to a teacher and updates staus to live
  *
- * @param {*} reqData
+ * @param {object} reqData - id's of subject and teacher to be assigned
+ * @returns {object} - status code and response - subject | error object
  */
 async function assignSubjectToTeacher(reqData) {
   try {
     const checkSubject = await subjectExists(reqData.id);
-    if (typeof checkSubject === 'object') {
+    if (typeof checkSubject === 'object' && checkSubject.statusCode) {
       return checkSubject;
     }
-
     if (!checkSubject) {
       return {
         statusCode: 404,
@@ -154,16 +168,16 @@ async function assignSubjectToTeacher(reqData) {
     }
 
     if (!checkSubject.teacherId) {
-      const [err, data] = await catchErrors(
+      const [err, data] = await errorHandlers.catchErrors(
         Subject.update(
           { teacherId: reqData.teacherId, status: LIVE },
-          { where: { id: reqData.id }, returning: true }
+          { where: { id: reqData.id }, returning: true, raw: true }
         )
       );
       if (err) {
         return { statusCode: 400, response: { Error: err.toString() } };
       }
-      const res = data.toJSON();
+      const res = data[1][0];
       const subjectData = {
         id: res.id,
         name: res.name,
@@ -185,14 +199,17 @@ async function assignSubjectToTeacher(reqData) {
 }
 
 /**
+ * reassignSubjectToTeacher
  *
+ * reassigns a subject to another teacher
  *
- * @param {*} reqData
+ * @param {object} reqData - id's of subject and teacher to be assigned
+ * @returns {object} - status code and response - subject | error object
  */
 async function reassignSubjectToTeacher(reqData) {
   try {
     const checkSubject = await subjectExists(reqData.id);
-    if (typeof checkSubject === 'object') {
+    if (typeof checkSubject === 'object' && checkSubject.statusCode) {
       return checkSubject;
     }
 
@@ -203,16 +220,16 @@ async function reassignSubjectToTeacher(reqData) {
       };
     }
 
-    const [err, data] = await catchErrors(
+    const [err, data] = await errorHandlers.catchErrors(
       Subject.update(
         { teacherId: reqData.teacherId, status: LIVE },
-        { where: { id: reqData.id }, returning: true }
+        { where: { id: reqData.id }, returning: true, raw: true }
       )
     );
     if (err) {
       return { statusCode: 400, response: { Error: err.toString() } };
     }
-    const res = data.toJSON();
+    const res = data[1][0];
     const subjectData = {
       id: res.id,
       name: res.name,
@@ -231,5 +248,6 @@ module.exports = {
   patchSubject,
   archiveSubject,
   assignSubjectToTeacher,
-  reassignSubjectToTeacher
+  reassignSubjectToTeacher,
+  subjectExists
 };

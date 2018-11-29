@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon index.js",
     "test_prep": "NODE_ENV=test sequelize db:migrate:undo:all && NODE_ENV=test sequelize db:migrate",
-    "test": "npm run test_prep && mocha \"./src/**/*.js\" --exit"
+    "test": "yarn run test_prep && mocha \"./src/**/*.js\" --exit",
+    "test-watch": "yarn run test_prep && mocha \"./src/**/*.js\" --exit --watch",
+    "test-single": "yarn run test_prep && mocha"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "eslint-plugin-react": "^7.11.1",
     "expect": "^23.6.0",
     "mocha": "^5.2.0",
+    "sinon": "^7.1.1",
     "supertest": "^3.3.0"
   },
   "dependencies": {
@@ -38,6 +41,7 @@
     "pg": "^7.6.0",
     "pg-hstore": "^2.3.2",
     "pm2": "^3.2.2",
+    "schm": "^0.4.1",
     "sequelize": "^4.41.0",
     "validator": "^10.8.0"
   }
