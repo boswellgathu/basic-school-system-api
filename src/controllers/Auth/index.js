@@ -13,10 +13,10 @@ const pubCert = fs.readFileSync(path.resolve(__dirname, '../../utils/configs/pub
  *
  * Verifies a token
  *
- * @param {object} req The request object
- * @param {object} res The response object
- * @param {function} next The callback function
- * @returns {object} res The response object
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @returns {object} res
  */
 function VerifyToken(req, res, next) {
   const token = req.headers['x-access-token'];
@@ -40,10 +40,10 @@ function VerifyToken(req, res, next) {
  *
  * Check if current user has the admin role
  *
- * @param {object} req The request object
- * @param {object} res The response object
- * @param {function} next The callback function
- * @returns {object} res The response object
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @returns {object} res
  */
 async function IsAdmin(req, res, next) {
   const { id } = req.decoded;
@@ -78,7 +78,7 @@ async function IsAdmin(req, res, next) {
  *
  * Generate a token
  *
- * @param {object} user The user object
+ * @param {object} user - user object
  * @returns {string} token
  */
 function generateToken(user) {
