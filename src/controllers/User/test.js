@@ -1,11 +1,11 @@
 const request = require('supertest');
 const expect = require('expect');
 const { User, Role } = require('../../../db/models');
-const { generateToken } = require('../AuthController');
-const { fetchAdminRole, fetchUser } = require('../../utils/dbUtils');
+const { generateToken } = require('../Auth');
+const { fetchUser, fetchAdmin } = require('../../utils/dbUtils');
 const app = require('../../../index');
 
-describe('users', () => {
+describe('User Controller', () => {
   let user;
   let token;
   beforeEach(() => {
@@ -19,19 +19,8 @@ describe('users', () => {
   });
 
   before(async () => {
-    await Role.bulkCreate([
-      { name: 'admin' },
-      { name: 'teacher' },
-      { name: 'student' }
-    ]);
-    const adminUser = await User.create({
-      firstName: 'admin',
-      lastName: 'admin',
-      email: 'admin@gmail.com',
-      password: 'admin123Qwerty',
-      roleId: await fetchAdminRole()
-    });
-    token = generateToken({ id: adminUser.toJSON().id });
+    const adminUser = await fetchAdmin();
+    token = generateToken({ id: adminUser.id });
   });
 
   after(() => User.destroy({ truncate: true, cascade: true }));

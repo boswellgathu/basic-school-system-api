@@ -1,8 +1,8 @@
 const express = require('express');
-const { IsAdmin, VerifyToken } = require('../controllers/AuthController');
+const { IsAdmin, VerifyToken } = require('../controllers/Auth');
 const {
   createUser, updateUser, deleteUser, signIn
-} = require('../controllers/UserController');
+} = require('../controllers/User');
 
 const UserRouter = express.Router();
 

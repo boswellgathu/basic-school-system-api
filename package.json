@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "test_prep": "NODE_ENV=test sequelize db:migrate:undo:all && NODE_ENV=test sequelize db:migrate",
-    "test": "yarn run test_prep && mocha \"./src/**/*.js\" --exit",
-    "test-watch": "yarn run test_prep && mocha \"./src/**/*.js\" --exit --watch",
-    "test-single": "yarn run test_prep && mocha"
+    "seed-roles-admin": "NODE_ENV=test sequelize db:seed --seed 20181127103312-default-roles 20181127104623-default-admin",
+    "test-env-setup": "NODE_ENV=test sequelize db:migrate:undo:all && NODE_ENV=test sequelize db:migrate",
+    "test-prep": "yarn run test-env-setup && yarn run seed-roles-admin",
+    "test": "yarn run test-prep && mocha \"./src/**/*.js\" --exit",
+    "test-watch": "yarn run test-prep && mocha \"./src/**/*.js\" --exit --watch",
+    "test-single": "yarn run test-prep && mocha"
   },
   "repository": {
     "type": "git",

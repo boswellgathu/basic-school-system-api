@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { User } = require('../../../db/models');
-const { generateToken } = require('../../controllers/AuthController');
+const { generateToken } = require('../../controllers/Auth');
 const { catchErrors } = require('../../utils/errorHandlers');
 const { fetchStudentRole } = require('../../utils/dbUtils');
 

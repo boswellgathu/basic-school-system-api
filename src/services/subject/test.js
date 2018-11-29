@@ -159,6 +159,7 @@ describe('subject service', () => {
       expect(actual.statusCode).toBe(200);
       expect(actual.response.name).toBe(subject.name);
       expect(actual.response.id).toBe(id);
+      expect(actual.response.status).toBe(ARCHIVED);
     });
 
     it('returns an error when subject is not found', async () => {
