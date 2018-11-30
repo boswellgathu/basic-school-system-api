@@ -4,7 +4,7 @@ node_js:
 services:
   - postgresql
 addons:
-  postgresql: "10.5"
+  postgresql: "10"
 before_install:
   - npm install sequelize-cli yarn -g
 before_script:
