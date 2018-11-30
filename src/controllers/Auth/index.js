@@ -21,13 +21,17 @@ const pubCert = fs.readFileSync(path.resolve(__dirname, '../../utils/configs/pub
 function VerifyToken(req, res, next) {
   const token = req.headers['x-access-token'];
   if (token) {
-    const options = {
-      expiresIn: '24h',
-      algorithm: 'RS256',
-    };
-    const decoded = jwt.verify(token, pubCert, options);
-    req.decoded = decoded;
-    next();
+    try {
+      const options = {
+        expiresIn: '24h',
+        algorithm: 'RS256',
+      };
+      const decoded = jwt.verify(token, pubCert, options);
+      req.decoded = decoded;
+      next();
+    } catch (err) {
+      return res.status(403).send({ Error: err.toString() });
+    }
   } else {
     return res.status(403).send({
       message: 'No token provided.',

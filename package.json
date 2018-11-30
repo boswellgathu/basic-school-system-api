@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "pm2 start index.js",
     "seed-roles-admin": "NODE_ENV=test sequelize db:seed --seed 20181127103312-default-roles 20181127104623-default-admin",
     "test-env-setup": "NODE_ENV=test sequelize db:migrate:undo:all && NODE_ENV=test sequelize db:migrate",
     "test-prep": "yarn run test-env-setup && yarn run seed-roles-admin",

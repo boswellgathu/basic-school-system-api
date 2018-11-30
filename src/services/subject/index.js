@@ -126,7 +126,7 @@ async function archiveSubject(subjectId) {
 
     const [err, data] = await errorHandlers.catchErrors(
       Subject.update(
-        { status: ARCHIVED },
+        { status: ARCHIVED, teacherId: null },
         { where: { id: subjectId }, returning: true, raw: true }
       )
     );
