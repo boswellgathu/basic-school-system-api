@@ -190,7 +190,7 @@ async function assignSubjectToTeacher(reqData) {
     return {
       statusCode: 202,
       response: {
-        message: `Subject: ${reqData.id} has a teacherId: ${teacherId} already`
+        message: `can't assign teacherId: ${reqData.teacherId} to Subject: ${reqData.id} with teacherId: ${teacherId}`
       }
     };
   } catch (err) {

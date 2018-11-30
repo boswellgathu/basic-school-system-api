@@ -31,10 +31,12 @@ module.exports = (sequelize, DataTypes) => {
     user.password = hash;
   });
 
-  User.beforeBulkCreate(async (user) => {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(user.password, salt);
-    user.password = hash;
+  User.beforeBulkCreate((users) => {
+    users.map(async (user) => {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(user.password, salt);
+      user.password = hash;
+    });
   });
 
   User.beforeUpdate(async (user) => {

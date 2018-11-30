@@ -205,12 +205,12 @@ describe('subject service', () => {
     });
 
     it('does not assign a teacher to a subject already assigned a teacher', async () => {
-      const reqData = { id: expectedSubject.id, teacherId: expectedTeacher.id };
+      const reqData = { id: expectedSubject.id, teacherId: 645 };
       const actual = await assignSubjectToTeacher(reqData);
 
       expect(actual.statusCode).toBe(202);
       expect(actual.response.message).toBe(
-        `Subject: ${reqData.id} has a teacherId: ${reqData.teacherId} already`
+        `can't assign teacherId: 645 to Subject: ${expectedSubject.id} with teacherId: ${expectedTeacher.id}`
       );
     });
 
