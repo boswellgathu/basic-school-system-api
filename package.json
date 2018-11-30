@@ -8,9 +8,10 @@
     "seed-roles-admin": "NODE_ENV=test sequelize db:seed --seed 20181127103312-default-roles 20181127104623-default-admin",
     "test-env-setup": "NODE_ENV=test sequelize db:migrate:undo:all && NODE_ENV=test sequelize db:migrate",
     "test-prep": "yarn run test-env-setup && yarn run seed-roles-admin",
-    "test": "yarn run test-prep && mocha \"./src/**/*.js\" --exit",
+    "test": "yarn run test-prep && nyc mocha \"./src/**/*.js\" --exit",
     "test-watch": "yarn run test-prep && mocha \"./src/**/*.js\" --exit --watch",
-    "test-single": "yarn run test-prep && mocha"
+    "test-single": "yarn run test-prep && nyc mocha",
+    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "repository": {
     "type": "git",
@@ -36,10 +37,12 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
+    "codecov": "^3.1.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "jsonwebtoken": "^8.3.0",
     "morgan": "^1.9.1",
+    "nyc": "^13.1.0",
     "pg": "^7.6.0",
     "pg-hstore": "^2.3.2",
     "pm2": "^3.2.2",
