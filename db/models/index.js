@@ -6,7 +6,7 @@ const customConfig = require('../../config');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || customConfig.env;
 // eslint-disable-next-line import/no-dynamic-require
-const config = require(`${__dirname}/../config/config.json`)[env];
+const config = require(path.join(__dirname, '/../config/config.json'))[env];
 const db = {};
 
 let sequelize;
