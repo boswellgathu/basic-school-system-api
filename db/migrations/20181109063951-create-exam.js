@@ -23,13 +23,15 @@ module.exports = {
           model: 'Subjects',
           key: 'id',
         },
+        allowNull: false
       },
       studentId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Subjects',
+          model: 'Users',
           key: 'id',
         },
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
