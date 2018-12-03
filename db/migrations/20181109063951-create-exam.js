@@ -1,3 +1,4 @@
+const { VALID, CANCELLED } = require('../constants');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -23,13 +24,28 @@ module.exports = {
           model: 'Subjects',
           key: 'id',
         },
+        allowNull: false
       },
       studentId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Subjects',
+          model: 'Users',
           key: 'id',
         },
+        allowNull: false
+      },
+      status: {
+        type: Sequelize.ENUM,
+        values: [VALID, CANCELLED],
+        defaultValue: VALID,
+      },
+      createdBy: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

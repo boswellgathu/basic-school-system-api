@@ -9,7 +9,7 @@ module.exports = {
       lastName: 'admin',
       email: 'admin@gmail.com',
       password: config.adminLogin,
-      roleId: '1'
+      roleId: 1
     });
   },
 

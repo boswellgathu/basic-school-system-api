@@ -61,3 +61,8 @@ typings/
 .next
 
 .DS_Store
+
+# coverage files
+.nyc_output
+coverage
+*.lcov
