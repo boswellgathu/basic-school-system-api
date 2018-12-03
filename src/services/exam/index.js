@@ -4,6 +4,43 @@ const errorHandlers = require('../../utils/errorHandlers');
 
 
 /**
+ * fetchSubjectByTeacherId
+ *
+ * gets a subject by the teacherId attribute of the subject
+ *
+ * @param {number} id - teacherId of the subject being fetched
+ * @returns object | boolean
+ */
+async function fetchSubjectByTeacherId(teacherId) {
+  try {
+    const [err, data] = await errorHandlers.catchErrors(
+      Subject.findAll(
+        {
+          where: { teacherId },
+          attributes: ['id'],
+          raw: true
+        }
+      )
+    );
+    if (err) {
+      return { statusCode: 500, response: { Error: err.toString() } };
+    }
+    if (data.length === 0) {
+      return false;
+    }
+
+    const subjects = [];
+    data.map((subject) => {
+      subjects.push(subject.id);
+    });
+
+    return subjects;
+  } catch (err) {
+    return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
+  }
+}
+
+/**
  * examExists
  *
  * Check if subject with given subjectId exists
@@ -45,6 +82,23 @@ async function examExists(examId) {
  */
 async function addExam(exam) {
   try {
+    const subjects = await fetchSubjectByTeacherId(exam.createdBy);
+    if (!subjects) {
+      return {
+        statusCode: 404,
+        response: {
+          Error: `Subject with teacherId: ${exam.createdBy} not found`
+        }
+      };
+    }
+    if (!subjects.includes(exam.subjectId)) {
+      return {
+        statusCode: 403,
+        response: {
+          Error: `Not allowed. Only teacher teaching subjectId: ${exam.subjectId} is allowed to add an exam record`
+        }
+      };
+    }
     const [err, res] = await errorHandlers.catchErrors(
       Exam.create(exam, { raw: true })
     );
@@ -56,7 +110,8 @@ async function addExam(exam) {
       examDate: res.examDate,
       grade: res.grade,
       subjectId: res.subjectId,
-      studentId: res.studentId
+      studentId: res.studentId,
+      createdBy: res.createdBy
     };
     return { statusCode: 201, response: examData };
   } catch (err) {
@@ -208,5 +263,6 @@ module.exports = {
   patchExam,
   cancelExam,
   viewExam,
-  examExists
+  examExists,
+  fetchSubjectByTeacherId
 };

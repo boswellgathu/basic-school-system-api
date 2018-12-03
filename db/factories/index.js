@@ -30,7 +30,7 @@ factory.define('Subject', Subject, (buildOptions) => {
   if (buildOptions.teacher) {
     return ({
       name: factory.chance('first'),
-      teacherId: factory.assoc('Teacher', 'id'),
+      teacherId: buildOptions.teacherId || factory.assoc('Teacher', 'id'),
       status: LIVE
     });
   }
