@@ -122,9 +122,9 @@ async function addExam(exam) {
 /**
  * patchExam
  *
- * Updates the name of a exam
+ * Updates the grade of an exam
  *
- * @param {object} subject - exam data
+ * @param {object} exam - exam data
  * @returns {object} - status code and response - subject | error object
  */
 async function patchExam(exam) {
@@ -139,10 +139,17 @@ async function patchExam(exam) {
         response: { Error: `Exam: ${exam.id} does not exist` }
       };
     }
-
+    if (checkExam.createdBy !== exam.teacherUpdating) {
+      return {
+        statusCode: 403,
+        response: {
+          Error: `Not allowed. Only teacher teaching subjectId: ${checkExam.subjectId} is allowed to update that exam record`
+        }
+      };
+    }
     const [err, data] = await errorHandlers.catchErrors(
       Exam.update(
-        exam,
+        { grade: exam.grade },
         { where: { id: exam.id }, returning: true, raw: true }
       )
     );
@@ -153,9 +160,7 @@ async function patchExam(exam) {
     const res = data[1][0];
     const subjectData = {
       id: res.id,
-      name: res.name,
-      teacherId: res.teacherId,
-      status: res.status
+      grade: res.grade
     };
     return { statusCode: 200, response: subjectData };
   } catch (err) {
@@ -183,7 +188,6 @@ async function cancelExam(subjectId) {
         response: { Error: `Exam: ${subjectId} does not exist` }
       };
     }
-
     const [err, data] = await errorHandlers.catchErrors(
       Exam.update(
         { status: ARCHIVED, teacherId: null },
