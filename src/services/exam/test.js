@@ -1,7 +1,6 @@
 const expect = require('expect');
 const factory = require('../../../db/factories');
 const { Exam, Subject, User } = require('../../../db/models');
-const { fetchTeacherRole, fetchStudentRole } = require('../../utils/dbUtils');
 const {
   addExam,
   patchExam,
@@ -16,26 +15,22 @@ describe('Exam service', () => {
   let student;
   let subject;
   let exam;
-  let studentRole;
-  let teacherRole;
-  before(async () => {
-    studentRole = await fetchStudentRole();
-    teacherRole = await fetchTeacherRole();
-    studentRole = await fetchStudentRole();
-    teacher = await factory.create('User', { roleId: teacherRole });
-    // student = factory.create('User', { roleId: studentRole });
-    subject = await factory.create('Subject', { roleId: teacherRole });
-    // exam = await factory.create('Exam', {},
-    //   { teacherRoleId: teacherRole, studentRoleId: studentRole });
 
-    console.log('what is this', teacher.dataValues);
-    console.log('what is this subject', subject.dataValues);
+  before(async () => {
+    teacher = await factory.create('Teacher');
+    student = await factory.create('Student');
+    subject = await factory.create('Subject', {}, { teacher: true });
+    exam = await factory.create('Exam', {}, { subjectId: subject.id, teacherId: subject.teacherId });
   });
 
   describe('examExists', () => {
     it('finds an exam by its id', async () => {
-      const actual = await examExists(exam.dataValues.id);
-      console.log(actual);
+      const actual = await examExists(exam.id);
+      expect(actual.id).toBe(exam.id);
+      expect(actual.studentId).toBe(exam.studentId);
+      expect(actual.examDate).toEqual(exam.examDate);
+      expect(actual.Subject.id).toBe(actual.subjectId);
+      expect(actual.createdBy).toBe(actual.Subject.teacherId);
     });
   });
 });

@@ -18,9 +18,8 @@ async function examExists(examId) {
         {
           where: { id: examId },
           include: [
-            { model: Subject, attributes: ['teacherId'] }
-          ],
-          raw: true
+            { model: Subject }
+          ]
         }
       )
     );
@@ -30,7 +29,7 @@ async function examExists(examId) {
     if (!data) {
       return false;
     }
-    return data;
+    return data.toJSON();
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
