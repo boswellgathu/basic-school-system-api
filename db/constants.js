@@ -6,6 +6,9 @@ const LIVE = 'live';
 const VALIDATION = 'validation';
 const ARCHIVED = 'archived';
 
+const VALID = 'valid';
+const CANCELLED = 'cancelled';
+
 module.exports = {
   roleEnum: [ADMIN, TEACHER, STUDENT],
   statusEnum: [LIVE, VALIDATION, ARCHIVED],
@@ -14,5 +17,7 @@ module.exports = {
   STUDENT,
   LIVE,
   VALIDATION,
-  ARCHIVED
+  ARCHIVED,
+  VALID,
+  CANCELLED
 };

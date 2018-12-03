@@ -1,5 +1,6 @@
 const expect = require('expect');
 const factory = require('../../../db/factories');
+const { VALID, CANCELLED } = require('../../../db/constants');
 const { Exam, Subject, User } = require('../../../db/models');
 const {
   addExam,
@@ -119,6 +120,34 @@ describe('Exam service', () => {
 
     it('fails if exam does not exist', async () => {
       const actual = await patchExam({
+        id: 4563892, teacherUpdating: 4563232, grade: 'D'
+      });
+      expect(actual.statusCode).toBe(404);
+      expect(actual.response.Error).toBe('Exam: 4563892 does not exist');
+    });
+  });
+
+  describe('cancelExam', () => {
+    it('cancels an existing exam record', async () => {
+      const actual = await cancelExam({
+        id: exam.id, teacherUpdating: teacher.id
+      });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.status).toBe(CANCELLED);
+    });
+
+    it('fails if updatingTeacher did not create the exam record', async () => {
+      const actual = await cancelExam({
+        id: exam.id, teacherUpdating: 4563232
+      });
+      expect(actual.statusCode).toBe(403);
+      expect(actual.response.Error).toBe(
+        `Not allowed. Only teacher teaching subjectId: ${exam.subjectId} is allowed to update that exam record`
+      );
+    });
+
+    it('fails if exam does not exist', async () => {
+      const actual = await cancelExam({
         id: 4563892, teacherUpdating: 4563232, grade: 'D'
       });
       expect(actual.statusCode).toBe(404);

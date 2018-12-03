@@ -1,5 +1,5 @@
 const { Exam, Subject, User } = require('../../../db/models');
-const { LIVE, ARCHIVED } = require('../../../db/constants');
+const { CANCELLED } = require('../../../db/constants');
 const errorHandlers = require('../../utils/errorHandlers');
 
 
@@ -111,7 +111,8 @@ async function addExam(exam) {
       grade: res.grade,
       subjectId: res.subjectId,
       studentId: res.studentId,
-      createdBy: res.createdBy
+      createdBy: res.createdBy,
+      status: res.status
     };
     return { statusCode: 201, response: examData };
   } catch (err) {
@@ -169,29 +170,37 @@ async function patchExam(exam) {
 }
 
 /**
- * archiveSubject
+ * cancelExam
  *
- * archives specified subject - to change status to archived
+ * cancel an existing exam - change status to cancelled
  *
- * @param {number} subjectId - id of specified subject
+ * @param {object} exam - { examId, teacherUpdating } - id of specified exam
  * @returns {object} - status code and response - subject | error object
  */
-async function cancelExam(subjectId) {
+async function cancelExam(exam) {
   try {
-    const checkExam = await examExists(subjectId);
+    const checkExam = await examExists(exam.id);
     if (typeof checkExam === 'object' && checkExam.statusCode) {
       return checkExam;
     }
     if (!checkExam) {
       return {
         statusCode: 404,
-        response: { Error: `Exam: ${subjectId} does not exist` }
+        response: { Error: `Exam: ${exam.id} does not exist` }
+      };
+    }
+    if (checkExam.createdBy !== exam.teacherUpdating) {
+      return {
+        statusCode: 403,
+        response: {
+          Error: `Not allowed. Only teacher teaching subjectId: ${checkExam.subjectId} is allowed to update that exam record`
+        }
       };
     }
     const [err, data] = await errorHandlers.catchErrors(
       Exam.update(
-        { status: ARCHIVED, teacherId: null },
-        { where: { id: subjectId }, returning: true, raw: true }
+        { status: CANCELLED },
+        { where: { id: exam.id }, returning: true, raw: true }
       )
     );
     if (err) {
@@ -200,8 +209,6 @@ async function cancelExam(subjectId) {
     const res = data[1][0];
     const subjectData = {
       id: res.id,
-      name: res.name,
-      teacherId: res.teacherId,
       status: res.status
     };
     return { statusCode: 200, response: subjectData };

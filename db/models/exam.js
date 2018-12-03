@@ -1,4 +1,5 @@
 /* eslint-disable func-names */
+const { VALID, CANCELLED } = require('../constants');
 
 module.exports = (sequelize, DataTypes) => {
   const Exam = sequelize.define('Exam', {
@@ -11,7 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     createdBy: {
       type: DataTypes.INTEGER,
       allowNull: false
-    }
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: [VALID, CANCELLED],
+      defaultValue: VALID,
+    },
   }, {});
   Exam.associate = (models) => {
     Exam.belongsTo(models.Subject, { foreignKey: 'subjectId' });
