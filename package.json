@@ -10,7 +10,7 @@
     "test-prep": "yarn run test-env-setup && yarn run seed-roles-admin",
     "test": "yarn run test-prep && nyc mocha \"./src/**/*.js\" --exit",
     "test-watch": "yarn run test-prep && mocha \"./src/**/*.js\" --exit --watch",
-    "test-single": "yarn run test-prep && nyc mocha",
+    "test-single": "yarn run test-prep && mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "repository": {
@@ -47,6 +47,7 @@
     "pg": "^7.6.0",
     "pg-hstore": "^2.3.2",
     "pm2": "^3.2.2",
+    "qs": "^6.6.0",
     "schm": "^0.4.1",
     "sequelize": "^4.41.0",
     "validator": "^10.8.0"
