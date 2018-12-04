@@ -15,6 +15,7 @@ app.use(bodyParser.urlencoded({
 
 app.use('/api', Routes.userRouter);
 app.use('/api', Routes.subjectRouter);
+app.use('/api', Routes.examRouter);
 
 app.get('*', (req, res) => res.status(200).send({
   message: 'Welcome, How are you?, feeling good? coolbeans yo!',

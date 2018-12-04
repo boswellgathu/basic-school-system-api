@@ -1,10 +1,10 @@
-const express = require('express');
+const { Router } = require('express');
 const { IsTeacher, VerifyToken } = require('../controllers/Auth');
 const {
   createExam, updateExam, invalidateExam, showExam
-} = require('../controllers/Subject');
+} = require('../controllers/Exam');
 
-const ExamRouter = express.Router();
+const ExamRouter = Router();
 
 ExamRouter.post('/exam', VerifyToken, IsTeacher, createExam);
 ExamRouter.put('/exam/:id', VerifyToken, IsTeacher, updateExam);
