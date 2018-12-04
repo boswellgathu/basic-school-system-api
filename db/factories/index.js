@@ -1,6 +1,6 @@
 const factoryGirl = require('factory-girl');
 const { Exam, Subject, User } = require('../models');
-const { LIVE } = require('../constants');
+const { LIVE, VALID } = require('../constants');
 const { fetchAdminRole, fetchTeacherRole, fetchStudentRole } = require('../../src/utils/dbUtils');
 
 const adapter = new factoryGirl.SequelizeAdapter();
@@ -8,21 +8,13 @@ const { factory } = factoryGirl;
 factory.setAdapter(adapter);
 
 factory.define('Exam', Exam, async (buildOptions) => {
-  if (buildOptions.subjectId) {
-    return ({
-      examDate: factory.chance('date'),
-      grade: factory.chance('character', { pool: 'ABCDE' }),
-      subjectId: buildOptions.subjectId,
-      studentId: factory.assoc('Student', 'id'),
-      createdBy: buildOptions.teacherId
-    });
-  }
   return ({
     examDate: factory.chance('date'),
     grade: factory.chance('character', { pool: 'ABCDE' }),
-    subjectId: factory.assoc('Subject', 'id'),
-    studentId: factory.assoc('Student', 'id'),
-    createdBy: factory.assoc('Teacher', 'id')
+    subjectId: buildOptions.subjectId || factory.assoc('Subject', 'id'),
+    studentId: buildOptions.studentId || factory.assoc('Student', 'id'),
+    createdBy: buildOptions.teacherId || factory.assoc('Teacher', 'id'),
+    status: buildOptions.status || VALID
   });
 });
 

@@ -8,7 +8,9 @@ const {
   cancelExam,
   viewExam,
   examExists,
-  fetchSubjectByTeacherId
+  fetchSubjectByTeacherId,
+  getOptions,
+  isStudent
 } = require('./');
 
 
@@ -16,6 +18,7 @@ describe('Exam service', () => {
   let teacher;
   let teacher2;
   let student;
+  let student2;
   let subject;
   let subject2;
   let subject3;
@@ -25,6 +28,7 @@ describe('Exam service', () => {
     teacher = await factory.create('Teacher');
     teacher2 = await factory.create('Teacher');
     student = await factory.create('Student');
+    student2 = await factory.create('Student');
     subject = await factory.create('Subject', {}, { teacher: true, teacherId: teacher.id });
     subject2 = await factory.create('Subject', {}, { teacher: true, teacherId: teacher.id });
     subject3 = await factory.create('Subject', {}, { teacher: true, teacherId: teacher2.id });
@@ -152,6 +156,98 @@ describe('Exam service', () => {
       });
       expect(actual.statusCode).toBe(404);
       expect(actual.response.Error).toBe('Exam: 4563892 does not exist');
+    });
+  });
+
+  describe('isStudent', () => {
+    it('returns false if user is not a student', async () => {
+      const actual = await isStudent(teacher.id);
+      expect(actual).toBeFalsy();
+    });
+
+    it('returns false if user is not a student', async () => {
+      const actual = await isStudent(student.id);
+      expect(actual).toBeTruthy();
+    });
+  });
+
+  describe('viewExam', () => {
+    before(async () => {
+      await factory.createMany('Exam', 2, {}, { subjectId: subject.id, teacherId: subject.teacherId });
+      await factory.createMany('Exam', 2, {}, { studentId: student2.id });
+      await factory.createMany('Exam', 2, {}, { subjectId: subject.id, teacherId: subject.teacherId, status: CANCELLED });
+    });
+
+    it('fetches all exam records', async () => {
+      const actual = await viewExam({ userId: teacher.id });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length >= 2).toBeTruthy();
+    });
+
+    it('fetches all exam records with given query limit', async () => {
+      const actual = await viewExam({ userId: teacher.id, limit: 1 });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 1).toBeTruthy();
+    });
+
+    it('fetches all exam records with given query - status - CANCELLED', async () => {
+      const actual = await viewExam({ userId: teacher.id, status: CANCELLED });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length >= 2).toBeTruthy();
+    });
+
+    it('fetches all exam records with given query - status - VALID', async () => {
+      const actual = await viewExam({ userId: teacher.id, status: VALID });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length >= 2).toBeTruthy();
+    });
+
+    it('fetches all exam records with given query - pageNo and limit', async () => {
+      const actual = await viewExam({ userId: teacher.id, pageNo: 1, limit: 2 });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 2).toBeTruthy();
+    });
+
+    it('fetches all exam records with given queryArgs', async () => {
+      const actual = await viewExam({
+        userId: teacher.id, createdBy: teacher.id, limit: 1, status: CANCELLED
+      });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 1).toBeTruthy();
+    });
+
+    it('a student only sees their records', async () => {
+      const actual = await viewExam({ userId: student2.id });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 2).toBeTruthy();
+    });
+  });
+
+  describe('getOptions', () => {
+    it('constructions filter, sort and pagination keywords', async () => {
+      const queryParams = {
+        limit: 5, pageNo: 3, subjectId: 23, status: VALID
+      };
+      const actual = await getOptions(queryParams);
+      expect(actual).toEqual({
+        limit: 5, offset: 10, where: { subjectId: 23, status: VALID }
+      });
+    });
+
+    it('does not add offset when either limit and offset not in queryParams', async () => {
+      const queryParams = {
+        contour: 20, limit: 23, subjectId: 23, status: VALID, drive: true
+      };
+      const actual = await getOptions(queryParams);
+      expect(actual).toEqual({ limit: 23, where: { subjectId: 23, status: VALID } });
+    });
+
+    it('removes key, value not in specified expected keywords', async () => {
+      const queryParams = {
+        contour: 20, maten: 23, subjectId: 23, status: VALID, drive: true
+      };
+      const actual = await getOptions(queryParams);
+      expect(actual).toEqual({ where: { subjectId: 23, status: VALID } });
     });
   });
 });

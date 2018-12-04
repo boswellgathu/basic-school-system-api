@@ -1,5 +1,5 @@
-const { Exam, Subject, User } = require('../../../db/models');
-const { CANCELLED } = require('../../../db/constants');
+const { Exam, Subject, User, Role } = require('../../../db/models');
+const { CANCELLED, STUDENT } = require('../../../db/constants');
 const errorHandlers = require('../../utils/errorHandlers');
 
 
@@ -217,53 +217,91 @@ async function cancelExam(exam) {
   }
 }
 
+function getOptions(queryData) {
+  const expectedKeywords = [
+    'pageNo', 'limit', 'status', 'createdBy', 'studentId', 'subjectId', 'examDate'
+  ];
+  let validQueryArgs = Object.entries(queryData).reduce((acc, [key, value]) => {
+    if (expectedKeywords.includes(key)) {
+      return { ...acc, [key]: value };
+    }
+    return { ...acc };
+  }, {});
+
+  if (['limit', 'pageNo'].every(arg => arg in validQueryArgs)) {
+    if (validQueryArgs.pageNo === 0) validQueryArgs.pageNo += 1;
+    validQueryArgs.offset = validQueryArgs.limit * (validQueryArgs.pageNo - 1);
+    delete validQueryArgs.pageNo;
+  } else if ('pageNo' in validQueryArgs) {
+    delete validQueryArgs.pageNo;
+  }
+  const where = {};
+  const args = ['status', 'createdBy', 'studentId', 'subjectId', 'examDate'];
+  args.map((arg) => {
+    if (arg in validQueryArgs) {
+      where[arg] = validQueryArgs[arg];
+      delete validQueryArgs[arg];
+    }
+  });
+  validQueryArgs = { ...validQueryArgs, where };
+  return validQueryArgs;
+}
+
+async function isStudent(userId) {
+  try {
+    let [err, data] = await errorHandlers.catchErrors(
+      User.findOne(
+        {
+          where: { id: userId },
+          include: [{ model: Role, attributes: ['name'] }],
+        }
+      )
+    );
+    if (err) {
+      return { statusCode: 500, response: { Error: err.toString() } };
+    }
+    data = data.toJSON();
+    if (!data) {
+      return false;
+    }
+
+    return data.Role.name === STUDENT;
+  } catch (err) {
+    return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
+  }
+}
 /**
  * viewExam
  *
- * assigns a validation subject to a teacher and updates staus to live
+ * loads exams and filters on search params
  *
- * @param {object} reqData - id's of subject and teacher to be assigned
+ * @param {object} reqData - data to filter on ?
  * @returns {object} - status code and response - subject | error object
  */
 async function viewExam(reqData) {
   try {
-    const checkExam = await examExists(reqData.id);
-    if (typeof checkExam === 'object' && checkExam.statusCode) {
-      return checkExam;
-    }
-    if (!checkExam) {
-      return {
-        statusCode: 404,
-        response: { Error: `Exam: ${reqData.id} does not exist` }
-      };
+    const options = getOptions(reqData);
+    const checkIfStudent = await isStudent(reqData.userId);
+
+    if (typeof checkIfStudent === 'object' && checkIfStudent.statusCode) {
+      return checkIfStudent;
     }
 
-    if (!checkExam.teacherId) {
-      const [err, data] = await errorHandlers.catchErrors(
-        Exam.update(
-          { teacherId: reqData.teacherId, status: LIVE },
-          { where: { id: reqData.id }, returning: true, raw: true }
-        )
-      );
-      if (err) {
-        return { statusCode: 400, response: { Error: err.toString() } };
-      }
-      const res = data[1][0];
-      const subjectData = {
-        id: res.id,
-        name: res.name,
-        teacherId: res.teacherId,
-        status: res.status
-      };
-      return { statusCode: 200, response: subjectData };
+    if (checkIfStudent) {
+      options.where.studentId = reqData.userId;
     }
-    const { teacherId } = checkExam;
-    return {
-      statusCode: 202,
-      response: {
-        message: `can't assign teacherId: ${reqData.teacherId} to Exam: ${reqData.id} with teacherId: ${teacherId}`
-      }
-    };
+
+    if (!options.limit) options.limit = 30;
+    options.raw = true;
+
+    const [err, data] = await errorHandlers.catchErrors(
+      Exam.findAndCountAll(options)
+    );
+    if (err) {
+      return { statusCode: 400, response: { Error: err.toString() } };
+    }
+
+    return { statusCode: 200, response: { data: data.rows } };
   } catch (err) {
     return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
   }
@@ -275,5 +313,7 @@ module.exports = {
   cancelExam,
   viewExam,
   examExists,
-  fetchSubjectByTeacherId
+  fetchSubjectByTeacherId,
+  getOptions,
+  isStudent
 };
