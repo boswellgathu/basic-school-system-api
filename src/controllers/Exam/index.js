@@ -7,7 +7,9 @@ const {
 } = require('../../services/exam');
 
 async function createExam(req, res) {
-  const sanitizedData = validateUserData(req.body);
+  const sanitizedData = validateUserData(
+    { ...req.body, createdBy: req.decoded.id }
+  );
 
   if (typeof sanitizedData === 'string') {
     return res.status(400).send({ validationError: sanitizedData });
