@@ -1,10 +1,7 @@
+const joi = require('joi');
+const { examSchema, userSchema, subjectSchema } = require('../../services/schemas');
 const { validateUserData } = require('../../utils/dataValidateUtils');
-const {
-  addExam,
-  patchExam,
-  cancelExam,
-  viewExam
-} = require('../../services/exam');
+const { addExam, patchExam, cancelExam, viewExam } = require('../../services/exam');
 
 async function createExam(req, res) {
   const sanitizedData = validateUserData(
@@ -14,7 +11,13 @@ async function createExam(req, res) {
   if (typeof sanitizedData === 'string') {
     return res.status(400).send({ validationError: sanitizedData });
   }
-  const { response, statusCode } = await addExam(sanitizedData);
+
+  const { error, value } = joi.validate(sanitizedData, examSchema);
+
+  if (error) {
+    return res.status(400).send({ validationError: error.toString() });
+  }
+  const { response, statusCode } = await addExam(value);
   return res.status(statusCode).send(response);
 }
 
