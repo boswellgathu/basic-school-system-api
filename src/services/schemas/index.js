@@ -26,8 +26,25 @@ const subjectSchema = Joi.object().keys({
   status: Joi.string().valid([LIVE, ARCHIVED, VALIDATION])
 }).with('status', 'teacherId');
 
+const patchExamSchema = Joi.object().keys({
+  id: Joi.number().integer().required(),
+  grade: Joi.string().valid(['A', 'B', 'C', 'D', 'E']).required()
+});
+
+const searchExamSchema = Joi.object().keys({
+  pageNo: Joi.number().integer(),
+  limit: Joi.number().integer(),
+  status: Joi.string().valid([VALID, CANCELLED]),
+  createdBy: Joi.number().integer(),
+  subjectId: Joi.number().integer(),
+  studentId: Joi.number().integer(),
+  grade: Joi.string().valid(['A', 'B', 'C', 'D', 'E'])
+}).with('pageNo', 'limit');
+
 module.exports = {
   examSchema,
   userSchema,
-  subjectSchema
+  subjectSchema,
+  patchExamSchema,
+  searchExamSchema
 };

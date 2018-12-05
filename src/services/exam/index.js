@@ -140,7 +140,8 @@ async function patchExam(exam) {
         response: { Error: `Exam: ${exam.id} does not exist` }
       };
     }
-    if (checkExam.createdBy !== exam.teacherUpdating) {
+    const subjectTeacherIds = [checkExam.Subject.teacherId, checkExam.createdBy];
+    if (subjectTeacherIds.every(id => id !== exam.teacherId)) {
       return {
         statusCode: 403,
         response: {
@@ -189,7 +190,8 @@ async function cancelExam(exam) {
         response: { Error: `Exam: ${exam.id} does not exist` }
       };
     }
-    if (checkExam.createdBy !== exam.teacherUpdating) {
+    const subjectTeacherIds = [checkExam.Subject.teacherId, checkExam.createdBy];
+    if (subjectTeacherIds.every(id => id !== exam.teacherId)) {
       return {
         statusCode: 403,
         response: {
@@ -219,7 +221,9 @@ async function cancelExam(exam) {
 
 function getOptions(queryData) {
   const expectedKeywords = [
-    'pageNo', 'limit', 'status', 'createdBy', 'studentId', 'subjectId', 'examDate'
+    'pageNo', 'limit', 'status',
+    'createdBy', 'subjectId',
+    'studentId', 'examDate', 'grade'
   ];
   let validQueryArgs = Object.entries(queryData).reduce((acc, [key, value]) => {
     if (expectedKeywords.includes(key)) {
@@ -236,7 +240,7 @@ function getOptions(queryData) {
     delete validQueryArgs.pageNo;
   }
   const where = {};
-  const args = ['status', 'createdBy', 'studentId', 'subjectId', 'examDate'];
+  const args = ['status', 'createdBy', 'subjectId', 'studentId', 'examDate', 'grade'];
   args.map((arg) => {
     if (arg in validQueryArgs) {
       where[arg] = validQueryArgs[arg];
@@ -293,7 +297,6 @@ async function viewExam(reqData) {
 
     if (!options.limit) options.limit = 30;
     options.raw = true;
-
     const [err, data] = await errorHandlers.catchErrors(
       Exam.findAndCountAll(options)
     );

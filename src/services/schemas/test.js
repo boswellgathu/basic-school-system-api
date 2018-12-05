@@ -1,7 +1,7 @@
 const expect = require('expect');
 const Joi = require('joi');
 const { VALID, LIVE, VALIDATION } = require('../../../db/constants');
-const { examSchema, userSchema, subjectSchema } = require('./');
+const { examSchema, userSchema, subjectSchema, patchExamSchema } = require('./');
 
 
 describe('schemas', () => {
@@ -66,6 +66,28 @@ describe('schemas', () => {
       userData = { ...userData, email: 'whaaat' };
       const actual = Joi.validate(userData, userSchema);
       expect(actual.error.toString()).toBe('ValidationError: child "email" fails because ["email" must be a valid email]');
+    });
+  });
+
+  describe('patchExamSchema', () => {
+    let patchExamData;
+    before(async () => {
+      patchExamData = {
+        id: 23,
+        grade: 'A'
+      };
+    });
+
+    it('validates on valid data', () => {
+      const actual = Joi.validate(patchExamData, patchExamSchema);
+      expect(actual.error).toBe(null);
+      expect(actual.value).toEqual(patchExamData);
+    });
+
+    it('fails on invalid data', () => {
+      patchExamData = { ...patchExamData, id: 'what the heck is an id' };
+      const actual = Joi.validate(patchExamData, patchExamSchema);
+      expect(actual.error.toString()).toBe('ValidationError: child "id" fails because ["id" must be a number]');
     });
   });
 

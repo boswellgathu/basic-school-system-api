@@ -2,17 +2,15 @@ const request = require('supertest');
 const expect = require('expect');
 const { User, Subject } = require('../../../db/models');
 const { generateToken } = require('../Auth');
-const { fetchTeacherRole, fetchAdmin } = require('../../utils/dbUtils');
+const factory = require('../../../db/factories');
 const { LIVE, VALIDATION, ARCHIVED } = require('../../../db/constants');
 const app = require('../../../index');
 
 describe('Subject Controller', () => {
   let token;
-  let roleId;
   before(async () => {
-    const adminUser = await fetchAdmin();
+    const adminUser = await factory.create('Admin');
     token = generateToken({ id: adminUser.id });
-    roleId = await fetchTeacherRole();
   });
 
   describe('POST /api', () => {
@@ -21,14 +19,7 @@ describe('Subject Controller', () => {
     };
     let teacher;
     before(async () => {
-      teacher = await User.create({
-        firstName: 'bravo',
-        lastName: 'one',
-        email: 'bravo.one@gmail.com',
-        password: '123Qwerty',
-        confirmPassword: '123Qwerty',
-        roleId
-      }, { raw: true });
+      teacher = await factory.create('Teacher');
     });
 
     after(() => {
@@ -177,14 +168,7 @@ describe('Subject Controller', () => {
       subject = {
         name: 'Controlling Drones for dummies'
       };
-      teacher = await User.create({
-        firstName: 'bravo',
-        lastName: 'one',
-        email: 'bravo.one@gmail.com',
-        password: '123Qwerty',
-        confirmPassword: '123Qwerty',
-        roleId
-      }, { raw: true });
+      teacher = await factory.create('Teacher');
       createdSubject = await Subject.create(subject, { raw: true });
     });
 
@@ -245,21 +229,7 @@ describe('Subject Controller', () => {
     let teacher1;
     let teacher2;
     before(async () => {
-      [teacher1, teacher2] = await User.bulkCreate([{
-        firstName: 'bravo',
-        lastName: 'one',
-        email: 'bravo.one@gmail.com',
-        password: '123Qwerty',
-        confirmPassword: '123Qwerty',
-        roleId
-      }, {
-        firstName: 'cartinger',
-        lastName: 'two',
-        email: 'cartinger.two@gmail.com',
-        password: '123Qwerty',
-        confirmPassword: '123Qwerty',
-        roleId
-      }], { returning: true, raw: true });
+      [teacher1, teacher2] = await factory.createMany('Teacher', 2);
       subject = {
         name: 'Controlling Drones for dummies',
         teacherId: teacher1.id

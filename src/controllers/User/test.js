@@ -1,8 +1,9 @@
 const request = require('supertest');
 const expect = require('expect');
-const { User, Role } = require('../../../db/models');
+const factory = require('../../../db/factories');
+const { User } = require('../../../db/models');
 const { generateToken } = require('../Auth');
-const { fetchUser, fetchAdmin } = require('../../utils/dbUtils');
+const { fetchUser } = require('../../utils/dbUtils');
 const app = require('../../../index');
 
 describe('User Controller', () => {
@@ -19,7 +20,7 @@ describe('User Controller', () => {
   });
 
   before(async () => {
-    const adminUser = await fetchAdmin();
+    const adminUser = await factory.create('Admin');
     token = generateToken({ id: adminUser.id });
   });
 
