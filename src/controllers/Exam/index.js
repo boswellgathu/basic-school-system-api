@@ -1,5 +1,6 @@
-const joi = require('joi');
-const { examSchema, userSchema, subjectSchema } = require('../../services/schemas');
+const Joi = require('joi');
+const Qs = require('qs');
+const schemas = require('../../services/schemas');
 const { validateUserData } = require('../../utils/dataValidateUtils');
 const { addExam, patchExam, cancelExam, viewExam } = require('../../services/exam');
 
@@ -12,7 +13,7 @@ async function createExam(req, res) {
     return res.status(400).send({ validationError: sanitizedData });
   }
 
-  const { error, value } = joi.validate(sanitizedData, examSchema);
+  const { error, value } = Joi.validate(sanitizedData, schemas.examSchema);
 
   if (error) {
     return res.status(400).send({ validationError: error.toString() });
@@ -28,29 +29,35 @@ async function updateExam(req, res) {
   if (typeof sanitizedData === 'string') {
     return res.status(400).send({ validationError: sanitizedData });
   }
-  const { response, statusCode } = await patchExam(sanitizedData);
+  const { error, value } = Joi.validate(sanitizedData, schemas.patchExamSchema);
+  if (error) {
+    return res.status(400).send({ validationError: error.toString() });
+  }
+  const { response, statusCode } = await patchExam(
+    { ...value, teacherId: req.decoded.id }
+  );
   return res.status(statusCode).send(response);
 }
 
 async function invalidateExam(req, res) {
-  const subject = { id: req.params.id };
-  const sanitizedData = validateUserData(subject);
+  const exam = { id: req.params.id };
+  let sanitizedData = validateUserData(exam);
 
   if (typeof sanitizedData === 'string') {
     return res.status(400).send({ validationError: sanitizedData });
   }
-  const { response, statusCode } = await cancelExam(sanitizedData.id);
+  sanitizedData = { ...sanitizedData, teacherId: req.decoded.id };
+  const { response, statusCode } = await cancelExam(sanitizedData);
   return res.status(statusCode).send(response);
 }
 
 async function showExam(req, res) {
-  const subject = { ...req.body, id: req.params.id };
-  const sanitizedData = validateUserData(subject);
-
-  if (typeof sanitizedData === 'string') {
-    return res.status(400).send({ validationError: sanitizedData });
+  const { error, value } = Joi.validate(Qs.parse(req.query), schemas.searchExamSchema);
+  if (error) {
+    return res.status(400).send({ validationError: error });
   }
-  const { response, statusCode } = await viewExam(sanitizedData);
+  const queryParams = { ...value, userId: req.decoded.id };
+  const { response, statusCode } = await viewExam(queryParams);
   return res.status(statusCode).send(response);
 }
 

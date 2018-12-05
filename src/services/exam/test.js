@@ -106,7 +106,7 @@ describe('Exam service', () => {
   describe('patchExam', () => {
     it('updates an existing exam record', async () => {
       const actual = await patchExam({
-        id: exam.id, teacherUpdating: teacher.id, grade: 'D'
+        id: exam.id, teacherId: teacher.id, grade: 'D'
       });
       expect(actual.statusCode).toBe(200);
       expect(actual.response.grade).toBe('D');
@@ -114,7 +114,7 @@ describe('Exam service', () => {
 
     it('fails if updatingTeacher did not create the exam record', async () => {
       const actual = await patchExam({
-        id: exam.id, teacherUpdating: 4563232, grade: 'D'
+        id: exam.id, teacherId: 4563232, grade: 'D'
       });
       expect(actual.statusCode).toBe(403);
       expect(actual.response.Error).toBe(
@@ -124,7 +124,7 @@ describe('Exam service', () => {
 
     it('fails if exam does not exist', async () => {
       const actual = await patchExam({
-        id: 4563892, teacherUpdating: 4563232, grade: 'D'
+        id: 4563892, teacherId: 4563232, grade: 'D'
       });
       expect(actual.statusCode).toBe(404);
       expect(actual.response.Error).toBe('Exam: 4563892 does not exist');
@@ -134,7 +134,7 @@ describe('Exam service', () => {
   describe('cancelExam', () => {
     it('cancels an existing exam record', async () => {
       const actual = await cancelExam({
-        id: exam.id, teacherUpdating: teacher.id
+        id: exam.id, teacherId: teacher.id
       });
       expect(actual.statusCode).toBe(200);
       expect(actual.response.status).toBe(CANCELLED);
@@ -142,7 +142,7 @@ describe('Exam service', () => {
 
     it('fails if updatingTeacher did not create the exam record', async () => {
       const actual = await cancelExam({
-        id: exam.id, teacherUpdating: 4563232
+        id: exam.id, teacherId: 4563232
       });
       expect(actual.statusCode).toBe(403);
       expect(actual.response.Error).toBe(
@@ -152,7 +152,7 @@ describe('Exam service', () => {
 
     it('fails if exam does not exist', async () => {
       const actual = await cancelExam({
-        id: 4563892, teacherUpdating: 4563232, grade: 'D'
+        id: 4563892, teacherId: 4563232, grade: 'D'
       });
       expect(actual.statusCode).toBe(404);
       expect(actual.response.Error).toBe('Exam: 4563892 does not exist');
