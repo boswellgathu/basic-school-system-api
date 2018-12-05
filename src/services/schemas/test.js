@@ -1,9 +1,6 @@
 const expect = require('expect');
 const Joi = require('joi');
-const factory = require('../../../db/factories');
-const {
-  VALID, CANCELLED, LIVE, ARCHIVED, VALIDATION
-} = require('../../../db/constants');
+const { VALID, LIVE, VALIDATION } = require('../../../db/constants');
 const { examSchema, userSchema, subjectSchema } = require('./');
 
 

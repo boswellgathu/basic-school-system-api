@@ -1,40 +1,32 @@
-const joi = require('joi');
+const Joi = require('joi');
 const {
   VALID, CANCELLED, LIVE, ARCHIVED, VALIDATION
 } = require('../../../db/constants');
 
-const examSchema = joi.object().keys({
-  examDate: joi.date().required(),
-  grade: joi
-    .string()
-    .valid(['A', 'B', 'C', 'D', 'E'])
-    .required(),
-  subjectId: joi.number().integer().required(),
-  studentId: joi.number().integer().required(),
-  createdBy: joi.number().integer().required(),
-  status: joi.string().valid([VALID, CANCELLED])
+const examSchema = Joi.object().keys({
+  examDate: Joi.date().required(),
+  grade: Joi.string().valid(['A', 'B', 'C', 'D', 'E']).required(),
+  subjectId: Joi.number().integer().required(),
+  studentId: Joi.number().integer().required(),
+  createdBy: Joi.number().integer().required(),
+  status: Joi.string().valid([VALID, CANCELLED])
 });
 
-const userSchema = joi.object().keys({
-  firstName: joi.string().required(),
-  lastName: joi.string().required(),
-  password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/),
-  email: joi.string().email().required(),
-  roleId: joi.number().integer().required(),
+const userSchema = Joi.object().keys({
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  password: Joi.string(),
+  email: Joi.string().email().required(),
+  roleId: Joi.number().integer().required(),
 });
 
-const subjectSchema = joi.object().keys({
-  name: joi.string().required(),
-  teacherId: joi.number().integer().optional(),
-  status: joi
-    .string()
-    .when('teacherId', {
-      is: joi.number().integer().required(),
-      then: joi.string().valid([LIVE, ARCHIVED, VALIDATION])
-    })
-});
+const subjectSchema = Joi.object().keys({
+  name: Joi.string().required(),
+  teacherId: Joi.number().integer(),
+  status: Joi.string().valid([LIVE, ARCHIVED, VALIDATION])
+}).with('status', 'teacherId');
 
-exports.default = {
+module.exports = {
   examSchema,
   userSchema,
   subjectSchema

@@ -104,8 +104,8 @@ async function IsTeacher(req, res, next) {
       message: 'Access denied'
     });
   }
-
   const role = user.toJSON().Role;
+
   if (role && role.name === TEACHER) {
     next();
   } else {

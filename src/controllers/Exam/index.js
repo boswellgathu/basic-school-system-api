@@ -11,9 +11,11 @@ async function createExam(req, res) {
   if (typeof sanitizedData === 'string') {
     return res.status(400).send({ validationError: sanitizedData });
   }
-  const { err, value } = await joi.validate(sanitizedData, examSchema);
-  if (err) {
-    return res.status(400).send({ validationError: err });
+
+  const { error, value } = joi.validate(sanitizedData, examSchema);
+
+  if (error) {
+    return res.status(400).send({ validationError: error.toString() });
   }
   const { response, statusCode } = await addExam(value);
   return res.status(statusCode).send(response);
