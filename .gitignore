@@ -66,3 +66,7 @@ typings/
 .nyc_output
 coverage
 *.lcov
+
+# pub/priv keys
+private_key.pem
+public_key.pem
