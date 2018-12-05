@@ -1,16 +1,16 @@
 {
   "development": {
-    "username": "boswellgathu",
+    "username": "real_user",
     "password": null,
-    "database": "assessment",
+    "database": "real_db",
     "host": "127.0.0.1",
     "dialect": "postgres",
     "operatorsAliases": false
   },
   "test": {
-    "username": "boswellgathu",
+    "username": "real_user",
     "password": null,
-    "database": "test_assessment",
+    "database": "test_db",
     "host": "127.0.0.1",
     "port": 5432,
     "dialect": "postgres",
@@ -18,9 +18,9 @@
     "operatorsAliases": false
   },
   "production": {
-    "username": "boswellgathu",
+    "username": "real_user",
     "password": null,
-    "database": "database_production",
+    "database": "prod_db",
     "host": "127.0.0.1",
     "dialect": "postgres"
   }
