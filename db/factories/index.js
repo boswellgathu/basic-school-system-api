@@ -21,17 +21,17 @@ factory.define('Exam', Exam, async (buildOptions) => {
 factory.define('Subject', Subject, (buildOptions) => {
   if (buildOptions.teacher) {
     return ({
-      name: factory.chance('first'),
+      name: buildOptions.name || factory.chance('first'),
       teacherId: buildOptions.teacherId || factory.assoc('Teacher', 'id'),
-      status: LIVE
+      status: buildOptions.status || LIVE
     });
   }
   return ({
-    name: factory.chance('first')
+    name: buildOptions.name || factory.chance('first')
   });
 });
 
-factory.define('Student', User, async (buildOptions) => {
+factory.define('Student', User, async () => {
   return ({
     firstName: factory.chance('first'),
     lastName: factory.chance('last'),
@@ -41,7 +41,7 @@ factory.define('Student', User, async (buildOptions) => {
   });
 });
 
-factory.define('Teacher', User, async (buildOptions) => {
+factory.define('Teacher', User, async () => {
   return ({
     firstName: factory.chance('first'),
     lastName: factory.chance('last'),

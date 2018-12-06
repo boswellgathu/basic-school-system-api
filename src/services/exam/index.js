@@ -1,5 +1,6 @@
 const { Exam, Subject, User, Role } = require('../../../db/models');
 const { CANCELLED, STUDENT } = require('../../../db/constants');
+const { getOptions } = require('../../utils/dbUtils');
 const errorHandlers = require('../../utils/errorHandlers');
 
 
@@ -219,38 +220,6 @@ async function cancelExam(exam) {
   }
 }
 
-function getOptions(queryData) {
-  const expectedKeywords = [
-    'pageNo', 'limit', 'status',
-    'createdBy', 'subjectId',
-    'studentId', 'examDate', 'grade'
-  ];
-  let validQueryArgs = Object.entries(queryData).reduce((acc, [key, value]) => {
-    if (expectedKeywords.includes(key)) {
-      return { ...acc, [key]: value };
-    }
-    return { ...acc };
-  }, {});
-
-  if (['limit', 'pageNo'].every(arg => arg in validQueryArgs)) {
-    if (validQueryArgs.pageNo === 0) validQueryArgs.pageNo += 1;
-    validQueryArgs.offset = validQueryArgs.limit * (validQueryArgs.pageNo - 1);
-    delete validQueryArgs.pageNo;
-  } else if ('pageNo' in validQueryArgs) {
-    delete validQueryArgs.pageNo;
-  }
-  const where = {};
-  const args = ['status', 'createdBy', 'subjectId', 'studentId', 'examDate', 'grade'];
-  args.map((arg) => {
-    if (arg in validQueryArgs) {
-      where[arg] = validQueryArgs[arg];
-      delete validQueryArgs[arg];
-    }
-  });
-  validQueryArgs = { ...validQueryArgs, where };
-  return validQueryArgs;
-}
-
 async function isStudent(userId) {
   try {
     let [err, data] = await errorHandlers.catchErrors(
@@ -284,7 +253,16 @@ async function isStudent(userId) {
  */
 async function viewExam(reqData) {
   try {
-    const options = getOptions(reqData);
+    const expectedKeywords = [
+      'pageNo', 'limit', 'status',
+      'createdBy', 'subjectId',
+      'studentId', 'examDate', 'grade'
+    ];
+    const whereKeyWords = [
+      'status', 'createdBy', 'subjectId',
+      'studentId', 'examDate', 'grade'
+    ];
+    const options = getOptions(expectedKeywords, whereKeyWords, reqData);
     const checkIfStudent = await isStudent(reqData.userId);
 
     if (typeof checkIfStudent === 'object' && checkIfStudent.statusCode) {
@@ -317,6 +295,5 @@ module.exports = {
   viewExam,
   examExists,
   fetchSubjectByTeacherId,
-  getOptions,
   isStudent
 };

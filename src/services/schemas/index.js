@@ -41,10 +41,19 @@ const searchExamSchema = Joi.object().keys({
   grade: Joi.string().valid(['A', 'B', 'C', 'D', 'E'])
 }).with('pageNo', 'limit');
 
+const searchSubjectSchema = Joi.object().keys({
+  pageNo: Joi.number().integer(),
+  limit: Joi.number().integer(),
+  name: Joi.string(),
+  status: Joi.string().valid([LIVE, ARCHIVED, VALIDATION]),
+  teacherId: Joi.number().integer(),
+}).with('pageNo', 'limit');
+
 module.exports = {
   examSchema,
   userSchema,
   subjectSchema,
   patchExamSchema,
-  searchExamSchema
+  searchExamSchema,
+  searchSubjectSchema
 };

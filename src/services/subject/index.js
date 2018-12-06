@@ -1,6 +1,7 @@
-const { Subject } = require('../../../db/models');
-const { LIVE, ARCHIVED } = require('../../../db/constants');
 const errorHandlers = require('../../utils/errorHandlers');
+const { getOptions } = require('../../utils/dbUtils');
+const { LIVE, ARCHIVED } = require('../../../db/constants');
+const { Subject } = require('../../../db/models');
 
 
 /**
@@ -242,6 +243,37 @@ async function reassignSubjectToTeacher(reqData) {
   }
 }
 
+/**
+ * viewSubject
+ *
+ * loads subjects and filters on search params
+ *
+ * @param {object} reqData - data to filter on ?
+ * @returns {object} - status code and response - subject | error object
+ */
+async function viewSubject(reqData) {
+  try {
+    const expectedKeywords = [
+      'pageNo', 'limit', 'status', 'name', 'teacherId'];
+    const whereKeyWords = ['status', 'name', 'teacherId'];
+    const options = getOptions(expectedKeywords, whereKeyWords, reqData);
+
+    if (!options.limit) options.limit = 30;
+    options.raw = true;
+
+    const [err, data] = await errorHandlers.catchErrors(
+      Subject.findAndCountAll(options)
+    );
+    if (err) {
+      return { statusCode: 400, response: { Error: err.toString() } };
+    }
+
+    return { statusCode: 200, response: { data: data.rows } };
+  } catch (err) {
+    return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
+  }
+}
+
 
 module.exports = {
   addSubject,
@@ -249,5 +281,6 @@ module.exports = {
   archiveSubject,
   assignSubjectToTeacher,
   reassignSubjectToTeacher,
-  subjectExists
+  subjectExists,
+  viewSubject
 };

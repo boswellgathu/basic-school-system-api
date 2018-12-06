@@ -3,7 +3,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const { catchErrors } = require('../../utils/errorHandlers');
 const { User, Role } = require('../../../db/models');
-const { ADMIN, TEACHER } = require('../../../db/constants');
+const { ADMIN, TEACHER, STUDENT } = require('../../../db/constants');
 
 const priCert = fs.readFileSync(path.resolve(__dirname, '../../../config/private_key.pem'), 'utf8');
 const pubCert = fs.readFileSync(path.resolve(__dirname, '../../../config/public_key.pem'), 'utf8');
@@ -115,6 +115,45 @@ async function IsTeacher(req, res, next) {
 }
 
 /**
+ * IsNotStudent
+ *
+ * Check if current user has the student role
+ *
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @returns {object} res
+ */
+async function IsNotStudent(req, res, next) {
+  const { id } = req.decoded;
+  const [err, user] = await catchErrors(User.findOne({
+    where: { id },
+    attributes: ['id'],
+    include: [{ model: Role, attributes: ['id', 'name'] }],
+  }));
+  if (err) {
+    return res.status(500).send({
+      message: 'An error occured, please try again later'
+    });
+  }
+
+  if (!user) {
+    return res.status(500).send({
+      message: 'Access denied'
+    });
+  }
+
+  const role = user.toJSON().Role;
+  if (role && role.name === STUDENT) {
+    return res.status(403).send({
+      message: 'Not authorised to perform this action'
+    });
+  }
+
+  next();
+}
+
+/**
  * GenerateToken
  *
  * Generate a token
@@ -133,5 +172,6 @@ module.exports = {
   VerifyToken,
   IsAdmin,
   generateToken,
-  IsTeacher
+  IsTeacher,
+  IsNotStudent
 };

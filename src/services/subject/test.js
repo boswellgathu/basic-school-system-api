@@ -1,25 +1,24 @@
 const expect = require('expect');
 const sinon = require('sinon');
+const factory = require('../../../db/factories');
 const { Subject, User } = require('../../../db/models');
 const { LIVE, VALIDATION, ARCHIVED } = require('../../../db/constants');
 const errorHandlers = require('../../utils/errorHandlers');
-const { fetchTeacherRole } = require('../../utils/dbUtils');
 const {
   addSubject,
   patchSubject,
   archiveSubject,
   assignSubjectToTeacher,
   reassignSubjectToTeacher,
-  subjectExists
+  subjectExists,
+  viewSubject
 } = require('./');
 
 describe('subject service', () => {
   describe('subjectExists', () => {
     let expectedSubject;
     before(async () => {
-      expectedSubject = await Subject.create({
-        name: 'Life of a tourist'
-      }, { raw: true });
+      expectedSubject = await factory.create('Subject');
     });
 
     after(async () => {
@@ -65,13 +64,7 @@ describe('subject service', () => {
       subject = {
         name: 'Beaver Architecture'
       };
-      expectedTeacher = await User.create({
-        firstName: 'teacher1',
-        lastName: 'new',
-        email: 'new.teacher1@subject.com',
-        password: 'I am not sure what this is',
-        roleId: await fetchTeacherRole()
-      }, { raw: true });
+      expectedTeacher = await factory.create('Teacher');
     });
 
     after(async () => {
@@ -110,10 +103,7 @@ describe('subject service', () => {
   describe('patchSubject', () => {
     let expectedSubject;
     before(async () => {
-      const subject = {
-        name: 'Silly walks for douchebags'
-      };
-      expectedSubject = await Subject.create(subject, { raw: true });
+      expectedSubject = await factory.create('Subject');
     });
 
     after(async () => {
@@ -145,7 +135,9 @@ describe('subject service', () => {
       subject = {
         name: 'Silly walks for douchebags'
       };
-      expectedSubject = await Subject.create(subject, { raw: true });
+      expectedSubject = await factory.create('Subject', {}, {
+        name: subject.name
+      });
     });
 
     after(async () => {
@@ -178,15 +170,11 @@ describe('subject service', () => {
       subject = {
         name: 'Silly walks for douchebags'
       };
-      expectedSubject = await Subject.create(subject, { raw: true });
+      expectedSubject = await factory.create('Subject', {}, {
+        name: subject.name
+      });
 
-      expectedTeacher = await User.create({
-        firstName: 'teacher1',
-        lastName: 'new',
-        email: 'new.teacher1@subject.com',
-        password: 'I am not sure what this is',
-        roleId: await fetchTeacherRole()
-      }, { raw: true });
+      expectedTeacher = await factory.create('Teacher');
     });
 
     after(async () => {
@@ -232,26 +220,13 @@ describe('subject service', () => {
       subject = {
         name: 'Silly walks for douchebags'
       };
-      expectedTeacher = await User.create({
-        firstName: 'teacher1',
-        lastName: 'new',
-        email: 'new.teacher1@subject.com',
-        password: 'I am not sure what this is',
-        roleId: await fetchTeacherRole()
-      }, { raw: true });
-
-      replacementTeacher = await User.create({
-        firstName: 'teacher1',
-        lastName: 'replacement',
-        email: 'replacement.teacher@subject.com',
-        password: 'I am not sure what this is',
-        roleId: await fetchTeacherRole()
-      }, { raw: true });
-
-      expectedSubject = await Subject.create(
-        { ...subject, teacherId: expectedTeacher.id },
-        { raw: true }
+      [expectedTeacher, replacementTeacher] = await factory.createMany(
+        'Teacher', 2
       );
+
+      expectedSubject = await factory.create('Subject', {}, {
+        name: subject.name, teacher: true, teacherId: expectedTeacher.id
+      });
     });
 
     after(async () => {
@@ -275,6 +250,62 @@ describe('subject service', () => {
 
       expect(actual.statusCode).toBe(404);
       expect(actual.response.Error).toBe('Subject: 6573 does not exist');
+    });
+  });
+
+  describe('viewSubject', () => {
+    let teacher1;
+    let teacher2;
+    before(async () => {
+      await Subject.destroy({ truncate: true, cascade: true });
+      await User.destroy({ truncate: true, cascade: true });
+
+      [teacher1, teacher2] = await factory.createMany(
+        'Teacher', 2
+      );
+      await factory.createMany('Subject', 2, {}, { teacher: true, teacherId: teacher1.id });
+      await factory.createMany('Subject', 2);
+      await factory.createMany('Subject', 2, {}, {
+        teacher: true, teacherId: teacher2.id, status: ARCHIVED
+      });
+    });
+
+    it('fetches all subject records', async () => {
+      const actual = await viewSubject({});
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length).toBe(6);
+    });
+
+    it('fetches all subject records with given query limit', async () => {
+      const actual = await viewSubject({ limit: 3 });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 3).toBeTruthy();
+    });
+
+    it('fetches all subject records with given query - status - LIVE', async () => {
+      const actual = await viewSubject({ status: LIVE });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 2).toBeTruthy();
+    });
+
+    it('fetches all subject records with given query - status - ARCHIVED', async () => {
+      const actual = await viewSubject({ status: ARCHIVED });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 2).toBeTruthy();
+    });
+
+    it('fetches all exam records with given query - pageNo and limit', async () => {
+      const actual = await viewSubject({ pageNo: 1, limit: 2 });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 2).toBeTruthy();
+    });
+
+    it('fetches all exam records with given queryArgs', async () => {
+      const actual = await viewSubject({
+        limit: 2, status: LIVE, teacherId: teacher1.id
+      });
+      expect(actual.statusCode).toBe(200);
+      expect(actual.response.data.length === 2).toBeTruthy();
     });
   });
 });
