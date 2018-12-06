@@ -12,7 +12,7 @@
     "test-watch": "yarn run test-prep && mocha \"./src/**/*.js\" --exit --watch",
     "test-single": "yarn run test-prep && mocha",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "setup-draft1": ". ./install.sh"
+    "setup-app": ". ./install.sh"
   },
   "repository": {
     "type": "git",

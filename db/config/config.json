@@ -1,16 +1,16 @@
 {
   "development": {
-    "username": "real_user",
+    "username": "real_pg_user",
     "password": null,
-    "database": "real_db",
+    "database": "real_pg_db",
     "host": "127.0.0.1",
     "dialect": "postgres",
     "operatorsAliases": false
   },
   "test": {
-    "username": "real_user",
+    "username": "real_pg_user",
     "password": null,
-    "database": "test_db",
+    "database": "test_pg_db",
     "host": "127.0.0.1",
     "port": 5432,
     "dialect": "postgres",
@@ -18,9 +18,9 @@
     "operatorsAliases": false
   },
   "production": {
-    "username": "real_user",
+    "username": "real_pg_user",
     "password": null,
-    "database": "prod_db",
+    "database": "prod_pg_db",
     "host": "127.0.0.1",
     "dialect": "postgres"
   }

@@ -1,15 +1,12 @@
 /* eslint-disable no-unused-vars */
-const { User } = require('../models');
 const config = require('../../config/config');
+const factory = require('../factories');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return User.create({
-      firstName: 'admin',
-      lastName: 'admin',
+    return factory.create('Admin', {}, {
       email: 'admin@gmail.com',
-      password: config.adminLogin,
-      roleId: 1
+      password: config.adminLogin
     });
   },
 
