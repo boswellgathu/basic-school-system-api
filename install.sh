@@ -34,7 +34,7 @@ openssl rsa -pubout -in ./config/private_key.pem -out ./config/public_key.pem
 
 # final round
 yarn install
-sequelize db:migrate:all
+sequelize db:migrate
 sequelize db:seed:all
 
 # Run tests
