@@ -5,8 +5,8 @@ const { catchErrors } = require('../../utils/errorHandlers');
 const { User, Role } = require('../../../db/models');
 const { ADMIN, TEACHER } = require('../../../db/constants');
 
-const priCert = fs.readFileSync(path.resolve(__dirname, '../../utils/configs/private.key'), 'utf8');
-const pubCert = fs.readFileSync(path.resolve(__dirname, '../../utils/configs/public.key'), 'utf8');
+const priCert = fs.readFileSync(path.resolve(__dirname, '../../../config/private_key.pem'), 'utf8');
+const pubCert = fs.readFileSync(path.resolve(__dirname, '../../../config/public_key.pem'), 'utf8');
 
 /**
  * VerifyToken

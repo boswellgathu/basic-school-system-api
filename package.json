@@ -11,7 +11,8 @@
     "test": "yarn run test-prep && nyc mocha \"./src/**/*.js\" --exit",
     "test-watch": "yarn run test-prep && mocha \"./src/**/*.js\" --exit --watch",
     "test-single": "yarn run test-prep && mocha",
-    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
+    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "setup-app": ". ./install.sh"
   },
   "repository": {
     "type": "git",

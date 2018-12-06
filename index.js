@@ -2,7 +2,7 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const Routes = require('./src/routes');
-const config = require('./config');
+const config = require('./config/config');
 
 const { port } = config;
 const app = express();

@@ -55,8 +55,8 @@ factory.define('Admin', User, async (buildOptions) => {
   return ({
     firstName: factory.chance('first'),
     lastName: factory.chance('last'),
-    email: factory.chance('email', { domain: 'school.com' }),
-    password: factory.chance('word'),
+    email: buildOptions.email || factory.chance('email'),
+    password: buildOptions.password || factory.chance('word'),
     roleId: await fetchAdminRole()
   });
 });
