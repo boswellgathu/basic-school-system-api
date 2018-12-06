@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 const { User } = require('../models');
-const config = require('../../config');
+const config = require('../../config/config');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
