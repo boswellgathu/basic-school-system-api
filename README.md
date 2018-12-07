@@ -6,7 +6,7 @@ Simple school system api
 ### Installation
 * Clone this repo `git git@github.com:boswellgathu/simple-school-system-api.git`
 * Navigate to the folder `cd simple-school-system-api`
-* create a .env file and add key values for:
+* create a .env - (check env.sample) file and add key values for:
     - PORT - which to run your app on - required.
     - NODE_ENV - development || production - required.
     - ADMINLOGIN - password to use for the default seeded admin - required.
