@@ -17,7 +17,7 @@ Simple school system api
 
 # API
 
-* The api documentation can be found here [link](https://gdocs-staging.herokuapp.com/api/docs)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/5dd06a9ec49d8c04cafa)
 
 ### End Points
 
