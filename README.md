@@ -6,6 +6,10 @@ Simple school system api
 ### Installation
 * Clone this repo `git git@github.com:boswellgathu/simple-school-system-api.git`
 * Navigate to the folder `cd simple-school-system-api`
+* create a .env file and add key values for:
+    - PORT - which to run your app on - required.
+    - NODE_ENV - development || production - required.
+    - ADMINLOGIN - password to use for the default seeded admin - required.
 * use the setup script to setup `yarn setup-app` the script will
     - create both local and test databases named real_pg_db and test_pg_db
     - check if you have sequelize-cli, pm2 and if not install it
@@ -49,6 +53,7 @@ Please note only an admin can do all the below actions except signin. Any user c
 |PUT         |/api/subject/assign/:id                          |assign to a teacher  |
 |PUT         |/api/subject/reassign/:id                        |reassign to a teacher|
 
+The exams actions can be done by a user with teacher role except the GET endpoints which can be done by any user and depending on their role, they will get different results.
 ## Exams [`/api/exam`]
 
 | Method     | Endpoint                                        | Description         |
