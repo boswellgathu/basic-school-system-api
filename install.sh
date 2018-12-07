@@ -2,7 +2,7 @@
 set -e
 
 if ! [ -x "$(command -v psql)" ]; then
-  echo 'Error: git is not installed.' >&2
+  echo 'Error: psql is not installed.' >&2
   exit -1
 fi
 
@@ -17,8 +17,8 @@ if ! [ -x "$(command -v sequelize)" ]; then
     npm install sequelize-cli -g
 fi
 if ! [ -x "$(command -v pm2)" ]; then
-    echo "Sequelize is not installed on your system"
-    echo "Installing sequelize"
+    echo "pm2 is not installed on your system"
+    echo "Installing pm2"
     npm install pm2 -g
 fi
 
