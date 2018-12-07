@@ -13,6 +13,11 @@ describe('Subject Controller', () => {
     token = generateToken({ id: adminUser.id });
   });
 
+  after(() => {
+    Subject.destroy({ truncate: true, cascade: true });
+    User.destroy({ truncate: true, cascade: true });
+  });
+
   describe('POST /api', () => {
     let subject = {
       name: 'Controlling Drones for dummies'

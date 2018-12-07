@@ -34,6 +34,7 @@ const patchExamSchema = Joi.object().keys({
 const searchExamSchema = Joi.object().keys({
   pageNo: Joi.number().integer(),
   limit: Joi.number().integer(),
+  examDate: Joi.date(),
   status: Joi.string().valid([VALID, CANCELLED]),
   createdBy: Joi.number().integer(),
   subjectId: Joi.number().integer(),

@@ -21,8 +21,9 @@ describe('subject service', () => {
       expectedSubject = await factory.create('Subject');
     });
 
-    after(async () => {
-      await Subject.destroy({ truncate: true, cascade: true });
+    after(() => {
+      Subject.destroy({ truncate: true, cascade: true });
+      User.destroy({ truncate: true, cascade: true });
     });
 
     it('success', async () => {

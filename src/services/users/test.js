@@ -1,11 +1,8 @@
 const expect = require('expect');
+const { User } = require('../../../db/models');
 const { fetchUser } = require('../../utils/dbUtils');
 const { validateUserData } = require('../../utils/dataValidateUtils');
-const {
-  verifyPassword,
-  addUser,
-  userExists
-} = require('./');
+const { verifyPassword, addUser, userExists } = require('./');
 
 
 describe('user service', () => {
@@ -18,6 +15,10 @@ describe('user service', () => {
       password: '123Qwerty',
       confirmPassword: '123Qwerty'
     };
+  });
+
+  after(() => {
+    User.destroy({ truncate: true, cascade: true });
   });
 
   it('validateUserData returns validated data', () => {
