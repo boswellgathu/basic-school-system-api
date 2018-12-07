@@ -154,6 +154,40 @@ async function IsNotStudent(req, res, next) {
 }
 
 /**
+ * attachRole
+ *
+ * attachs a users role to the req.decoded object
+ *
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @returns {object} res
+ */
+async function attachRole(req, res, next) {
+  const { id } = req.decoded;
+  const [err, user] = await catchErrors(User.findOne({
+    where: { id },
+    attributes: ['id'],
+    include: [{ model: Role, attributes: ['id', 'name'] }],
+  }));
+  if (err) {
+    return res.status(500).send({
+      message: 'An error occured, please try again later'
+    });
+  }
+
+  if (!user) {
+    return res.status(500).send({
+      message: 'Access denied'
+    });
+  }
+
+  const role = user.toJSON().Role;
+  req.decoded.roleName = role.name;
+  next();
+}
+
+/**
  * GenerateToken
  *
  * Generate a token
@@ -173,5 +207,6 @@ module.exports = {
   IsAdmin,
   generateToken,
   IsTeacher,
-  IsNotStudent
+  IsNotStudent,
+  attachRole
 };

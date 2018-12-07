@@ -294,6 +294,19 @@ describe('Subject Controller', () => {
       });
     });
 
+    it('/api/subject - gets all subjects', (done) => {
+      request(app)
+        .get('/api/subject')
+        .set('Accept', 'application/json')
+        .set('x-access-token', newToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(6);
+          done();
+        });
+    });
+
     it('/api/subject - gets all subjects - limit & pageNo', (done) => {
       request(app)
         .get('/api/subject?limit=3&pageNo=0')

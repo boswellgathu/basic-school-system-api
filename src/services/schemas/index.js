@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const {
-  VALID, CANCELLED, LIVE, ARCHIVED, VALIDATION
+  VALID, CANCELLED, LIVE, ARCHIVED, VALIDATION, STUDENT, TEACHER
 } = require('../../../db/constants');
 
 const examSchema = Joi.object().keys({
@@ -49,11 +49,18 @@ const searchSubjectSchema = Joi.object().keys({
   teacherId: Joi.number().integer(),
 }).with('pageNo', 'limit');
 
+const searchUserSchema = Joi.object().keys({
+  pageNo: Joi.number().integer(),
+  limit: Joi.number().integer(),
+  userType: Joi.string().valid(STUDENT, TEACHER)
+}).with('pageNo', 'limit');
+
 module.exports = {
   examSchema,
   userSchema,
   subjectSchema,
   patchExamSchema,
   searchExamSchema,
-  searchSubjectSchema
+  searchSubjectSchema,
+  searchUserSchema
 };

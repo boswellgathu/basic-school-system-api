@@ -1,10 +1,14 @@
+const Joi = require('joi');
+const Qs = require('qs');
+const schemas = require('../../services/schemas');
 const { validateUserData } = require('../../utils/dataValidateUtils');
 const {
   verifyPassword,
   addUser,
   putUser,
   removeUser,
-  authenticate
+  authenticate,
+  viewUser
 } = require('../../services/users');
 
 
@@ -88,9 +92,26 @@ async function deleteUser(req, res) {
   return res.status(statusCode).send(response);
 }
 
+async function showUser(req, res) {
+  const { error, value } = Joi.validate(Qs.parse(req.query), schemas.searchUserSchema);
+  if (error) {
+    return res.status(400).send({ validationError: error });
+  }
+  const queryParams = {
+    ...value,
+    user: {
+      id: req.decoded.id,
+      roleName: req.decoded.roleName
+    }
+  };
+  const { response, statusCode } = await viewUser(queryParams);
+  return res.status(statusCode).send(response);
+}
+
 module.exports = {
   signIn,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  showUser
 };

@@ -174,4 +174,114 @@ describe('User Controller', () => {
         });
     });
   });
+
+  describe('GET /api/user', () => {
+    let teacher;
+    let adminToken;
+    let teacherToken;
+    let studentToken;
+    before(async () => {
+      await User.destroy({ truncate: true, cascade: true });
+
+      const admin = await factory.create('Admin');
+      teacher = await factory.create('Teacher');
+      const student = await factory.create('Student');
+      adminToken = generateToken({ id: admin.id });
+      teacherToken = generateToken({ id: teacher.id });
+      studentToken = generateToken({ id: student.id });
+      await factory.createMany('Teacher', 2);
+      await factory.createMany('Student', 4);
+    });
+
+    it('/api/user - gets all users - admin', (done) => {
+      request(app)
+        .get('/api/user')
+        .set('Accept', 'application/json')
+        .set('x-access-token', adminToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(8);
+          done();
+        });
+    });
+
+    it('/api/user - admin can sort for teachers', (done) => {
+      request(app)
+        .get('/api/user?userType=teacher')
+        .set('Accept', 'application/json')
+        .set('x-access-token', adminToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(3);
+          done();
+        });
+    });
+
+    it('/api/user - admin can sort for students', (done) => {
+      request(app)
+        .get('/api/user?userType=student')
+        .set('Accept', 'application/json')
+        .set('x-access-token', adminToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(5);
+          done();
+        });
+    });
+
+    it('/api/user - gets all students - teacher', (done) => {
+      request(app)
+        .get('/api/user')
+        .set('Accept', 'application/json')
+        .set('x-access-token', teacherToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(5);
+          done();
+        });
+    });
+
+    it('/api/user - gets all users - limit & pageNo', (done) => {
+      request(app)
+        .get('/api/user?limit=3&pageNo=0')
+        .set('Accept', 'application/json')
+        .set('x-access-token', teacherToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(3);
+          done();
+        });
+    });
+
+    it('/api/subject - gets all users - limit only', (done) => {
+      request(app)
+        .get('/api/user?limit=1')
+        .set('Accept', 'application/json')
+        .set('x-access-token', teacherToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(1);
+          done();
+        });
+    });
+
+    it('/api/user - returns student\'s data to a student', (done) => {
+      request(app)
+        .get('/api/user')
+        .set('Accept', 'application/json')
+        .set('x-access-token', studentToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(1);
+          done();
+        });
+    });
+  });
 });
