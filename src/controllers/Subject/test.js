@@ -271,4 +271,118 @@ describe('Subject Controller', () => {
         });
     });
   });
+
+  describe('GET /api/subject', () => {
+    let teacher1;
+    let teacher2;
+    let newToken;
+    let studentToken;
+    before(async () => {
+      await Subject.destroy({ truncate: true, cascade: true });
+      await User.destroy({ truncate: true, cascade: true });
+
+      [teacher1, teacher2] = await factory.createMany(
+        'Teacher', 2
+      );
+      const student = await factory.create('Student');
+      newToken = generateToken({ id: teacher1.id });
+      studentToken = generateToken({ id: student.id });
+      await factory.createMany('Subject', 2, {}, { teacher: true, teacherId: teacher1.id });
+      await factory.createMany('Subject', 2);
+      await factory.createMany('Subject', 2, {}, {
+        teacher: true, teacherId: teacher2.id, status: ARCHIVED
+      });
+    });
+
+    it('/api/subject - gets all subjects', (done) => {
+      request(app)
+        .get('/api/subject')
+        .set('Accept', 'application/json')
+        .set('x-access-token', newToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(6);
+          done();
+        });
+    });
+
+    it('/api/subject - gets all subjects - limit & pageNo', (done) => {
+      request(app)
+        .get('/api/subject?limit=3&pageNo=0')
+        .set('Accept', 'application/json')
+        .set('x-access-token', newToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(3);
+          done();
+        });
+    });
+
+    it('/api/subject - gets all subjects - limit only', (done) => {
+      request(app)
+        .get('/api/subject?limit=1')
+        .set('Accept', 'application/json')
+        .set('x-access-token', newToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(1);
+          done();
+        });
+    });
+
+    it('/api/subject - gets all subjects - status', (done) => {
+      request(app)
+        .get(`/api/subject?status=${LIVE}`)
+        .set('Accept', 'application/json')
+        .set('x-access-token', newToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(2);
+          done();
+        });
+    });
+
+    it('/api/subject - gets all subjects - teacherId', (done) => {
+      request(app)
+        .get(`/api/subject?teacherId=${teacher1.id}`)
+        .set('Accept', 'application/json')
+        .set('x-access-token', newToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(2);
+          done();
+        });
+    });
+
+    it('/api/subject - gets all subjects - teacherId, status, limit', (done) => {
+      request(app)
+        .get(`/api/subject?status=${ARCHIVED}&teacherId=${teacher2.id}&limit=2`)
+        .set('Accept', 'application/json')
+        .set('x-access-token', newToken)
+        .expect(200)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.data.length).toBe(2);
+          done();
+        });
+    });
+
+    it('/api/subject - should return an error to a student', (done) => {
+      request(app)
+        .get('/api/subject?limit=2')
+        .set('Accept', 'application/json')
+        .set('x-access-token', studentToken)
+        .expect(403)
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.body.message).toBe('Not authorised to perform this action');
+          done();
+        });
+    });
+  });
 });

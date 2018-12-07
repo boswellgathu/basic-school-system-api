@@ -51,10 +51,37 @@ async function fetchAdmin() {
   return found;
 }
 
+function getOptions(expectedKeywords, whereKeyWords, queryData) {
+  let validQueryArgs = Object.entries(queryData).reduce((acc, [key, value]) => {
+    if (expectedKeywords.includes(key)) {
+      return { ...acc, [key]: value };
+    }
+    return { ...acc };
+  }, {});
+
+  if (['limit', 'pageNo'].every(arg => arg in validQueryArgs)) {
+    if (validQueryArgs.pageNo === 0) validQueryArgs.pageNo += 1;
+    validQueryArgs.offset = validQueryArgs.limit * (validQueryArgs.pageNo - 1);
+    delete validQueryArgs.pageNo;
+  } else if ('pageNo' in validQueryArgs) {
+    delete validQueryArgs.pageNo;
+  }
+  const where = {};
+  whereKeyWords.map((arg) => {
+    if (arg in validQueryArgs) {
+      where[arg] = validQueryArgs[arg];
+      delete validQueryArgs[arg];
+    }
+  });
+  validQueryArgs = { ...validQueryArgs, where };
+  return validQueryArgs;
+}
+
 module.exports = {
   fetchAdminRole,
   fetchTeacherRole,
   fetchStudentRole,
   fetchUser,
-  fetchAdmin
+  fetchAdmin,
+  getOptions
 };

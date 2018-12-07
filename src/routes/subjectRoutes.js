@@ -1,7 +1,8 @@
 const express = require('express');
-const { IsAdmin, VerifyToken } = require('../controllers/Auth');
+const { IsAdmin, VerifyToken, IsNotStudent } = require('../controllers/Auth');
 const {
-  createSubject, updateSubject, deleteSubject, assignTeacher, reassignTeacher
+  createSubject, updateSubject, deleteSubject, assignTeacher, reassignTeacher,
+  searchSubject
 } = require('../controllers/Subject');
 
 const SubjectRouter = express.Router();
@@ -11,5 +12,6 @@ SubjectRouter.put('/subject/:id', VerifyToken, IsAdmin, updateSubject);
 SubjectRouter.put('/subject/archive/:id', VerifyToken, IsAdmin, deleteSubject);
 SubjectRouter.put('/subject/assign/:id', VerifyToken, IsAdmin, assignTeacher);
 SubjectRouter.put('/subject/reassign/:id', VerifyToken, IsAdmin, reassignTeacher);
+SubjectRouter.get('/subject', VerifyToken, IsNotStudent, searchSubject);
 
 module.exports = SubjectRouter;

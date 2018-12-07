@@ -1,10 +1,14 @@
+const Joi = require('joi');
+const Qs = require('qs');
+const schemas = require('../../services/schemas');
 const { validateUserData } = require('../../utils/dataValidateUtils');
 const {
   addSubject,
   patchSubject,
   archiveSubject,
   assignSubjectToTeacher,
-  reassignSubjectToTeacher
+  reassignSubjectToTeacher,
+  viewSubject
 } = require('../../services/subject');
 
 async function createSubject(req, res) {
@@ -61,11 +65,20 @@ async function reassignTeacher(req, res) {
   return res.status(statusCode).send(response);
 }
 
+async function searchSubject(req, res) {
+  const { error, value } = Joi.validate(Qs.parse(req.query), schemas.searchSubjectSchema);
+  if (error) {
+    return res.status(400).send({ validationError: error });
+  }
+  const { response, statusCode } = await viewSubject(value);
+  return res.status(statusCode).send(response);
+}
 
 module.exports = {
   createSubject,
   updateSubject,
   deleteSubject,
   assignTeacher,
-  reassignTeacher
+  reassignTeacher,
+  searchSubject
 };

@@ -1,8 +1,12 @@
 const bcrypt = require('bcryptjs');
-const { User } = require('../../../db/models');
-const { generateToken } = require('../../controllers/Auth');
+const { Op } = require('sequelize');
 const { catchErrors } = require('../../utils/errorHandlers');
-const { fetchStudentRole } = require('../../utils/dbUtils');
+const { fetchStudentRole, fetchAdminRole, fetchTeacherRole } = require('../../utils/dbUtils');
+const { getOptions } = require('../../utils/dbUtils');
+const { generateToken } = require('../../controllers/Auth');
+const { STUDENT, TEACHER, ADMIN } = require('../../../db/constants');
+const { User } = require('../../../db/models');
+
 
 function verifyPassword(userData) {
   const { password, confirmPassword } = userData;
@@ -160,11 +164,76 @@ async function removeUser(user) {
   }
 }
 
+async function getRoleId(userType) {
+  let roleId;
+  if (userType === TEACHER) {
+    roleId = await fetchTeacherRole();
+  } else {
+    roleId = await fetchStudentRole();
+  }
+  return roleId;
+}
+
+
+/**
+ * viewUser
+ *
+ * loads subjects and filters on search params
+ *
+ * @param {object} reqData - data to filter on ?
+ * @returns {object} - status code and response - subject | error object
+ */
+async function viewUser(reqData) {
+  try {
+    const expectedKeywords = ['pageNo', 'limit', 'userType'];
+    const whereKeyWords = [];
+    let options = getOptions(expectedKeywords, whereKeyWords, reqData);
+
+    if (!options.limit) options.limit = 30;
+    options.raw = true;
+
+    if (reqData.user.roleName === STUDENT) {
+      options = { where: { id: reqData.user.id } };
+    }
+    if (reqData.user.roleName === TEACHER) {
+      const adminRole = await fetchAdminRole();
+      const teacherRole = await fetchTeacherRole();
+      options = {
+        ...options,
+        where: { roleId: { [Op.notIn]: [adminRole, teacherRole] } }
+      };
+    }
+    if (reqData.user.roleName === ADMIN) {
+      const adminRole = await fetchAdminRole();
+      let roleOpts = { [Op.notIn]: [adminRole] };
+      if (reqData.userType) {
+        const roleId = await getRoleId(reqData.userType);
+        roleOpts = roleId;
+      }
+      options = {
+        ...options,
+        where: { roleId: roleOpts }
+      };
+    }
+    const [err, data] = await catchErrors(
+      User.findAndCountAll(options)
+    );
+    if (err) {
+      return { statusCode: 400, response: { Error: err.toString() } };
+    }
+
+    return { statusCode: 200, response: { data: data.rows } };
+  } catch (err) {
+    return { statusCode: 400, response: { Error: { [err.name]: err.message } } };
+  }
+}
+
 module.exports = {
   verifyPassword,
   authenticate,
   addUser,
   putUser,
   removeUser,
-  userExists
+  userExists,
+  viewUser
 };
