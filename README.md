@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/boswellgathu/pren_test_staff.svg?branch=master)](https://travis-ci.org/boswellgathu/pren_test_staff)
+[![Build Status](https://travis-ci.org/boswellgathu/simple-school-system-api.svg?branch=master)](https://travis-ci.org/boswellgathu/pren_test_staff)
 [![codecov](https://codecov.io/gh/boswellgathu/pren_test_staff/branch/master/graph/badge.svg)](https://codecov.io/gh/boswellgathu/pren_test_staff)
 
 Simple school system api
@@ -10,7 +10,7 @@ Simple school system api
     - PORT - which to run your app on - required.
     - NODE_ENV - development || production - required.
     - ADMINLOGIN - password to use for the default seeded admin - required.
-* use the setup script to setup `yarn setup-app` the script will
+* Run `yarn setup-app`  to use the setup script to setup - the script will
     - create both local and test databases named real_pg_db and test_pg_db
     - check if you have sequelize-cli, pm2 and if not install it
     - generate RSA key pair to use for jwt
