@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/boswellgathu/simple-school-system-api.svg?branch=master)](https://travis-ci.org/boswellgathu/simple-school-system-api)
 [![codecov](https://codecov.io/gh/boswellgathu/simple-school-system-api/branch/master/graph/badge.svg)](https://codecov.io/gh/boswellgathu/simple-school-system-api)
 
-Simple school system api
+Simple school system api.
 
 ### Installation
 * Clone this repo `git git@github.com:boswellgathu/simple-school-system-api.git`
