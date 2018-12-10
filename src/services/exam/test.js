@@ -165,7 +165,7 @@ describe('Exam service', () => {
       expect(actual).toBeFalsy();
     });
 
-    it('returns false if user is not a student', async () => {
+    it('returns true if user is a student', async () => {
       const actual = await isStudent(student.id);
       expect(actual).toBeTruthy();
     });
